@@ -7,6 +7,7 @@ import type SalamanderHomePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
 import { renderBanner } from "./banner";
 import { renderButtons, runButtonAction } from "./buttons";
+import { mountNewsGroup } from "./newsPanel";
 import { mountToday } from "./todayPanel";
 import { mountWeather } from "./weatherPanel";
 
@@ -86,8 +87,10 @@ export class HomeView extends MarkdownRenderChild {
   }
 
   private mountPanels(): void {
-    const { left } = this.slots;
+    const { left, center } = this.slots;
+    const config = this.plugin.configStore.config!;
     mountWeather(this, left, this.slots.bannerWeather);
     mountToday(this, left);
+    for (const group of config.news) mountNewsGroup(this, center, group);
   }
 }

@@ -178,3 +178,41 @@
 .sh-root .sh-task input { margin: 0; flex: 0 0 auto; }
 .sh-root .sh-dim { opacity: 0.6; }
 .sh-root .sh-task-date { color: var(--text-faint); font-size: 0.85em; }
+
+/* ── News ───────────────────────────────────────────────── */
+.sh-root .sh-cards {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+}
+.sh-root .sh-card {
+  flex: 0 0 31%;
+  min-width: 170px;
+  scroll-snap-align: start;
+  background: var(--sh-panel);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+.sh-root .sh-card-img {
+  height: 92px;
+  background: repeating-linear-gradient(45deg, var(--background-modifier-hover) 0 6px, transparent 6px 12px);
+}
+.sh-root .sh-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sh-root .sh-card-title { display: block; padding: 7px 9px 4px; line-height: 1.35; }
+.sh-root .sh-card-meta { padding: 0 9px 8px; }
+.sh-root .sh-card-overflow { margin-top: 6px; }
+
+.sh-root .sh-news-item { padding: 7px 0; border-bottom: 1px dashed var(--sh-line); }
+.sh-root .sh-news-item:last-child { border-bottom: 0; }
+.sh-root .sh-news-title { display: block; }
+.sh-root .sh-news-summary {
+  font-size: 0.9em;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
