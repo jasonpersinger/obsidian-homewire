@@ -26,7 +26,7 @@ is the visual target.
 
 ## Global Constraints
 
-- Plugin id `salamander-home`, name `Salamander Home`, `isDesktopOnly: false`, `minAppVersion: 1.4.0`, MIT license, author `Jason`, authorUrl `https://holler.works`.
+- Plugin id `salamander-home`, name `Salamander Home`, `isDesktopOnly: false`, `minAppVersion: 1.4.0`, MIT license, author `Jason`, authorUrl `https://messy.quest`.
 - **Never insert feed-supplied strings as HTML.** No `innerHTML`, `outerHTML`, `insertAdjacentHTML`, or `MarkdownRenderer` on remote content. Use `createEl(tag, { text })` or `setText` only.
 - Links and image `src` only allow `http:` and `https:` (`isHttpUrl`).
 - Remote caches use per-device storage (`app.loadLocalStorage` / `app.saveLocalStorage`), never `data.json`.
