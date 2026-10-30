@@ -27,7 +27,7 @@ export function mountCalendar(view: HomeView, el: HTMLElement): { setBillDates(d
   const sec = view.section();
   const f = panelFrame(el, "Calendar");
   const now = new Date();
-  let year = now.getFullYear(), month = now.getMonth();
+  let year = view.calendarMonth?.year ?? now.getFullYear(), month = view.calendarMonth?.month ?? now.getMonth();
   let billDates = new Set<string>();
 
   const open = (ymd: string) => {
@@ -46,12 +46,14 @@ export function mountCalendar(view: HomeView, el: HTMLElement): { setBillDates(d
       month += d;
       if (month < 0) { month = 11; year--; }
       if (month > 11) { month = 0; year++; }
+      view.calendarMonth = { year, month };
       draw();
     };
     nav.createEl("button", { cls: "hw-more", text: "‹" }).addEventListener("click", () => step(-1));
     nav.createEl("button", { cls: "hw-more", text: "Today" }).addEventListener("click", () => {
       year = new Date().getFullYear();
       month = new Date().getMonth();
+      view.calendarMonth = null;
       draw();
     });
     nav.createEl("button", { cls: "hw-more", text: "›" }).addEventListener("click", () => step(1));

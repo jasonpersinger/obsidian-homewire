@@ -24,6 +24,8 @@ The three note paths can be changed in the plugin settings.
 
 ```yaml
 banner:
+  clock: true                # large clock (default true)
+  marketSession: true        # US market pre-market / open / after hours / closed, NYSE holidays included (default true)
   fearGreed: true            # CNN Fear & Greed index in the banner (default false)
 
 clippings:                   # newest notes from Obsidian Web Clipper (default shown)

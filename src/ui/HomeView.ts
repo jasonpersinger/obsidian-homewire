@@ -7,6 +7,7 @@ import type HomewirePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
 import { renderBanner } from "./banner";
 import { mountClippings } from "./clippingsPanel";
+import { mountClock } from "./clockPanel";
 import { mountFearGreed } from "./fearGreedPanel";
 import { renderButtons, runButtonAction } from "./buttons";
 import { mountBills } from "./billsPanel";
@@ -21,6 +22,8 @@ export class HomeView extends MarkdownRenderChild {
   slots!: { bannerWeather: HTMLElement; bannerSide: HTMLElement; left: HTMLElement; center: HTMLElement; right: HTMLElement };
   private generation: Component | null = null;
   private renderedDay = "";
+  /** The month the calendar shows, kept across re-renders; null means "the current month". */
+  calendarMonth: { year: number; month: number } | null = null;
 
   constructor(containerEl: HTMLElement, readonly plugin: HomewirePlugin) {
     super(containerEl);
@@ -127,7 +130,9 @@ export class HomeView extends MarkdownRenderChild {
       const clip = config.clippings;
       guard(left, "Clippings", () => mountClippings(this, left, clip));
     }
-    if (config.banner.fearGreed) guard(this.slots.bannerSide, "Fear & Greed", () => mountFearGreed(this, this.slots.bannerSide));
+    const side = this.slots.bannerSide;
+    if (config.banner.clock || config.banner.marketSession) guard(side, "Clock", () => mountClock(this, side, config.banner));
+    if (config.banner.fearGreed) guard(side, "Fear & Greed", () => mountFearGreed(this, side));
     for (const group of config.news) guard(center, group.title, () => mountNewsGroup(this, center, group));
     let calendar: { setBillDates(d: Set<string>): void } | null = null;
     guard(right, "Calendar", () => (calendar = mountCalendar(this, right)));

@@ -313,3 +313,19 @@
 .hw-root .hw-clip:last-child { border-bottom: 0; }
 .hw-root .hw-clip-title { display: block; line-height: 1.35; }
 .hw-root .hw-clip-out { text-decoration: none; }
+
+/* ── Clock & market session ─────────────────────────────── */
+.hw-root .hw-clock { margin-bottom: 14px; }
+.hw-root .hw-clock-time {
+  font-family: var(--font-heading-theme, var(--font-interface));
+  font-size: 2.2em;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--text-normal);
+}
+.hw-root .hw-session { margin-top: 6px; font-size: 0.8em; }
+.hw-root .hw-session-tag { text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; }
+.hw-root .hw-session-open .hw-session-tag { color: var(--hw-pos); }
+.hw-root .hw-session-pre .hw-session-tag,
+.hw-root .hw-session-after .hw-session-tag { color: var(--hw-tertiary); }
+.hw-root .hw-session-closed .hw-session-tag { color: var(--text-muted); }

@@ -108,16 +108,18 @@ describe("banner and clippings options", () => {
   const minimal = {};
   test("defaults: fear & greed off, clippings on from the Clippings folder", () => {
     const { config } = validateConfig(minimal);
-    expect(config!.banner).toEqual({ fearGreed: false });
+    expect(config!.banner).toEqual({ fearGreed: false, clock: true, marketSession: true });
     expect(config!.clippings).toEqual({ folder: "Clippings", limit: 5 });
   });
   test("can turn fear & greed on and configure or hide clippings", () => {
     expect(validateConfig({ banner: { fearGreed: true } }).config!.banner.fearGreed).toBe(true);
+    expect(validateConfig({ banner: { clock: false, marketSession: false } }).config!.banner).toEqual({ fearGreed: false, clock: false, marketSession: false });
     expect(validateConfig({ clippings: { folder: "Reading", limit: 8 } }).config!.clippings).toEqual({ folder: "Reading", limit: 8 });
     expect(validateConfig({ clippings: false }).config!.clippings).toBeNull();
   });
   test("bad values are errors", () => {
     expect(validateConfig({ banner: { fearGreed: "yes" } }).errors.join()).toMatch(/banner\.fearGreed/);
+    expect(validateConfig({ banner: { clock: 1 } }).errors.join()).toMatch(/banner\.clock/);
     expect(validateConfig({ clippings: { limit: 0 } }).errors.join()).toMatch(/clippings\.limit/);
   });
   test("the default note leaves fear & greed off", () => {
