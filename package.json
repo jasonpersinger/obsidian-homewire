@@ -1,6 +1,6 @@
 {
   "name": "homewire",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Glance-style homepage: news, markets, weather, today's tasks, bills and a calendar in one note.",
   "main": "main.js",
   "type": "module",
