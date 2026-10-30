@@ -22,7 +22,13 @@
 .hw-home .cm-sizer {
   max-width: none;
 }
-.hw-home.hw-home.hw-home :is(.inline-title, .metadata-container, .metadata-properties) {
+/* Hide the properties block in both modes. Each selector mirrors Obsidian's own
+   show-properties rule plus .hw-home, so it outranks it without !important. */
+.hw-home .inline-title,
+.markdown-preview-view.show-properties.hw-home .metadata-container,
+.hw-home .markdown-preview-view.show-properties .metadata-container,
+.markdown-source-view.is-live-preview.show-properties.hw-home .metadata-container:not(.mod-error),
+.hw-home .markdown-source-view.is-live-preview.show-properties .metadata-container:not(.mod-error) {
   display: none;
 }
 
