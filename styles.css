@@ -131,3 +131,50 @@
 @container (max-width: 900px) {
   .sh-root .sh-cols { grid-template-columns: 1fr; }
 }
+
+.sh-root .sh-hidden { display: none; }
+.sh-root .sh-strong { color: var(--text-normal); font-weight: 600; }
+.sh-root .sh-status:empty { display: none; }
+.sh-root .sh-status { margin-top: 3px; display: flex; gap: 8px; }
+.sh-root .sh-offline { color: var(--sh-neg); opacity: 0.8; }
+.sh-root .sh-inline-icon { display: inline-flex; vertical-align: -2px; }
+.sh-root .sh-inline-icon svg { width: 1em; height: 1em; }
+
+/* ── Weather ────────────────────────────────────────────── */
+.sh-root .sh-wx-now { margin-bottom: 4px; }
+.sh-root .sh-bars {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  align-items: end;
+  height: 46px;
+  margin: 8px 0 2px;
+}
+.sh-root .sh-bar { height: var(--h); background: var(--background-modifier-border-hover, var(--sh-line)); }
+.sh-root .sh-bar-now { background: var(--sh-accent); box-shadow: var(--salamander-glow, none); }
+.sh-root .sh-bar-ticks { display: grid; grid-template-columns: repeat(24, 1fr); }
+.sh-root .sh-bar-ticks span { grid-column: var(--col); white-space: nowrap; }
+.sh-root .sh-days { margin-top: 8px; }
+.sh-root .sh-day { gap: 6px; }
+.sh-root .sh-day-name { flex: 0 0 3.2em; }
+.sh-root .sh-day-temps { flex: 0 0 4.2em; text-align: right; }
+.sh-root .sh-day-rain { flex: 0 0 2.6em; text-align: right; font-size: 0.85em; }
+.sh-root .sh-range { position: relative; flex: 1; height: 6px; background: var(--background-modifier-hover); }
+.sh-root .sh-range-fill {
+  position: absolute;
+  inset: 0 var(--to) 0 var(--from);
+  background: linear-gradient(90deg, var(--sh-secondary), var(--sh-tertiary), var(--sh-accent));
+}
+.sh-root .sh-wx-sun { margin-top: 8px; }
+
+/* ── Today ──────────────────────────────────────────────── */
+.sh-root .sh-task {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.sh-root .sh-task input { margin: 0; flex: 0 0 auto; }
+.sh-root .sh-dim { opacity: 0.6; }
+.sh-root .sh-task-date { color: var(--text-faint); font-size: 0.85em; }
