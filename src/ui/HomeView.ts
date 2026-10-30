@@ -2,7 +2,7 @@
 // Each render is a "generation": a child Component that owns every panel's
 // events and timers, so a config change tears them all down cleanly.
 import { Component, MarkdownRenderChild } from "obsidian";
-import { localYmd } from "../core/dates";
+import { localYmd, relativeAge } from "../core/dates";
 import type SalamanderHomePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
 import { renderBanner } from "./banner";
@@ -26,9 +26,13 @@ export class HomeView extends MarkdownRenderChild {
   onload(): void {
     this.plugin.views.add(this);
     this.registerEvent(this.plugin.configStore.on("change", () => this.render()));
-    // Re-render after local midnight so the date, Today box and calendar roll over.
+    // Each minute: roll over after local midnight, otherwise just age the "updated Xm ago" labels.
     this.registerInterval(window.setInterval(() => {
-      if (localYmd(new Date()) !== this.renderedDay) this.render();
+      if (localYmd(new Date()) !== this.renderedDay) return this.render();
+      const now = Date.now();
+      this.containerEl.querySelectorAll<HTMLElement>("[data-fetched]").forEach((el) => {
+        el.setText(`updated ${relativeAge(now - Number(el.dataset.fetched))} ago`);
+      });
     }, 60_000));
     this.render();
   }
