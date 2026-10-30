@@ -216,3 +216,52 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ── Calendar ───────────────────────────────────────────── */
+.sh-root .sh-cal-nav { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.sh-root .sh-cal-nav .sh-more { padding: 0 4px; font-size: 0.9em; }
+.sh-root .sh-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.85em; }
+.sh-root .sh-cal-head { color: var(--text-faint); padding-bottom: 2px; }
+.sh-root .sh-cal-day {
+  position: relative;
+  height: auto;
+  padding: 3px 0 5px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--text-normal);
+  font: inherit;
+  cursor: pointer;
+}
+.sh-root .sh-cal-day:hover { background: var(--background-modifier-hover); }
+.sh-root .sh-cal-out { color: var(--text-faint); }
+.sh-root .sh-cal-today { background: var(--sh-accent); color: var(--text-on-accent); font-weight: 700; }
+.sh-root .sh-cal-today:hover { background: var(--sh-accent-1); }
+.sh-root .sh-cal-note::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 3px;
+  height: 3px;
+  transform: translateX(-50%);
+  background: currentColor;
+  opacity: 0.7;
+}
+.sh-root .sh-bill { text-decoration: underline 2px var(--sh-tertiary); text-underline-offset: 3px; }
+
+/* ── Bills ──────────────────────────────────────────────── */
+.sh-root .sh-bill-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.sh-root .sh-bill-left input { margin: 0; }
+.sh-root .sh-bill-name { color: var(--text-normal); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sh-root .sh-bill-name:hover { color: var(--sh-accent); }
+.sh-root .sh-bill-right { white-space: nowrap; }
+.sh-root .sh-due-soon { color: var(--sh-tertiary); }
+
+/* ── Markets ────────────────────────────────────────────── */
+.sh-root .sh-quote { gap: 10px; padding: 5px 0; }
+.sh-root .sh-quote-id { flex: 1; min-width: 0; line-height: 1.25; }
+.sh-root .sh-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sh-root .sh-quote-spark { flex: 0 0 80px; display: flex; }
+.sh-root .sh-quote-num { text-align: right; line-height: 1.25; white-space: nowrap; }
