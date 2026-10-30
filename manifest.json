@@ -1,9 +1,9 @@
 {
   "id": "homewire",
   "name": "Homewire",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "minAppVersion": "1.8.7",
-  "description": "A Glance-style homepage: news, markets, weather, today's tasks, bills and a calendar in one note.",
+  "description": "Turn a note into a homepage with live news, markets, weather, today's tasks, bills and a calendar.",
   "author": "Jason",
   "authorUrl": "https://holler.works",
   "isDesktopOnly": false
