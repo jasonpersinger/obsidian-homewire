@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { parse } from "yaml";
-import { DEFAULT_CONFIG_NOTE, extractYamlBlock, validateConfig } from "../../src/core/config";
+import { DEFAULT_CONFIG_NOTE, extractYamlBlock, groupCacheKey, notePath, validateConfig } from "../../src/core/config";
 
 const defaults = () => validateConfig(parse(extractYamlBlock(DEFAULT_CONFIG_NOTE)!));
 
@@ -72,5 +72,34 @@ describe("validateConfig errors", () => {
     const r = validateConfig(null);
     expect(r.config).toBeNull();
     expect(r.errors).toHaveLength(1);
+  });
+});
+
+describe("review fixes", () => {
+  test("cacheMinutes below 1 is rejected (would refresh in a tight loop)", () => {
+    for (const cacheMinutes of [0, -5]) {
+      const r = validateConfig({ news: [{ title: "N", cacheMinutes, feeds: [{ url: "https://x/rss", title: "X" }] }] });
+      expect(r.config).toBeNull();
+      expect(r.errors.join()).toMatch(/news\[0\]\.cacheMinutes/);
+    }
+  });
+  test("negative limit and collapseAfter are rejected", () => {
+    const r = validateConfig({
+      news: [{ title: "N", limit: -1, feeds: [{ url: "https://x/rss", title: "X" }] }],
+      markets: [{ title: "M", collapseAfter: -2, markets: [{ symbol: "A", name: "A" }] }],
+    });
+    expect(r.errors.join()).toMatch(/news\[0\]\.limit/);
+    expect(r.errors.join()).toMatch(/markets\[0\]\.collapseAfter/);
+  });
+  test("groupCacheKey changes when the feeds change, not just the title", () => {
+    const a = groupCacheKey("news", "Top", ["https://a", "6"]);
+    expect(groupCacheKey("news", "Top", ["https://a", "6"])).toBe(a);
+    expect(groupCacheKey("news", "Top", ["https://b", "6"])).not.toBe(a);
+    expect(groupCacheKey("markets", "Top", ["https://a", "6"])).not.toBe(a);
+  });
+  test("notePath normalizes and adds .md", () => {
+    expect(notePath("Bills")).toBe("Bills.md");
+    expect(notePath(" Finance//Bills.md ")).toBe("Finance/Bills.md");
+    expect(notePath("/Home Config")).toBe("Home Config.md");
   });
 });

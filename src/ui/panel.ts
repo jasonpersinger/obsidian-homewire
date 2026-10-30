@@ -1,6 +1,26 @@
 // Shared panel chrome: an uppercase label, a box, and a faint status footer.
 import { relativeAge } from "../core/dates";
+import type { Component } from "obsidian";
 import type { PanelState } from "../data/panelLoader";
+
+/** Timers tick this often; each panel's maxAgeMs decides whether a tick actually fetches. */
+export const TICK_MS = 60_000;
+
+/** Returns a function that is false once `sec` has been unloaded (late async work must stop). */
+export function aliveFlag(sec: Component): () => boolean {
+  let alive = true;
+  sec.register(() => (alive = false));
+  return () => alive;
+}
+
+/** Shows a one-line error in place of a panel that failed, without touching the others. */
+export function panelError(el: HTMLElement, title: string, err: unknown): void {
+  console.error(`Salamander Home: ${title} panel failed`, err);
+  el.createDiv({ cls: "sh-section" }).createDiv({
+    cls: "sh-faint sh-offline",
+    text: `${title}: ${err instanceof Error ? err.message : String(err)}`,
+  });
+}
 
 export interface PanelFrame { section: HTMLElement; label: HTMLElement; body: HTMLElement; status: HTMLElement }
 

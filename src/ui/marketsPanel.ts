@@ -1,9 +1,9 @@
-import type { MarketGroupConfig } from "../core/config";
+import { groupCacheKey, type MarketGroupConfig } from "../core/config";
 import { parseYahooChart, yahooChartUrl, type Quote } from "../core/markets";
 import { loadPanel, type PanelState } from "../data/panelLoader";
 import { fetchJson } from "../obsidian/http";
 import type { HomeView } from "./HomeView";
-import { collapse, panelFrame, renderStatus } from "./panel";
+import { aliveFlag, collapse, panelFrame, renderStatus, TICK_MS } from "./panel";
 import { sparkline } from "./sparkline";
 
 const MARKETS_MS = 5 * 60_000;
@@ -26,9 +26,11 @@ const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 
 
 export function mountMarketGroup(view: HomeView, el: HTMLElement, group: MarketGroupConfig): void {
   const sec = view.section();
+  const alive = aliveFlag(sec);
   const f = panelFrame(el, group.title);
 
   const draw = (s: PanelState<Row[]>) => {
+    if (!alive()) return;
     renderStatus(f.status, s);
     if (!s.data) return;
     f.body.empty();
@@ -52,7 +54,15 @@ export function mountMarketGroup(view: HomeView, el: HTMLElement, group: MarketG
   };
 
   const load = (force: boolean) =>
-    loadPanel({ cache: view.plugin.cache, key: `markets:${group.title}`, maxAgeMs: MARKETS_MS, force, fetch: () => fetchGroup(group), onUpdate: draw });
-  sec.registerInterval(window.setInterval(() => void load(false), MARKETS_MS));
+    loadPanel({
+      cache: view.plugin.cache,
+      key: groupCacheKey("markets", group.title, group.markets.flatMap((m) => [m.symbol, m.name])),
+      maxAgeMs: MARKETS_MS,
+      force,
+      isValid: Array.isArray,
+      fetch: () => fetchGroup(group),
+      onUpdate: draw,
+    });
+  sec.registerInterval(window.setInterval(() => void load(false), TICK_MS));
   void load(view.forceNext);
 }

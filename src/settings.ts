@@ -1,4 +1,5 @@
 import { PluginSettingTab, Setting, type App } from "obsidian";
+import { notePath } from "./core/config";
 import type SalamanderHomePlugin from "./main";
 
 export interface SalamanderHomeSettings { homePath: string; configPath: string; billsPath: string }
@@ -20,7 +21,7 @@ export class SalamanderHomeSettingTab extends PluginSettingTab {
     const field = (key: keyof SalamanderHomeSettings, name: string, desc: string) =>
       new Setting(containerEl).setName(name).setDesc(desc).addText((t) =>
         t.setPlaceholder(DEFAULT_SETTINGS[key]).setValue(this.plugin.settings[key]).onChange(async (v) => {
-          this.plugin.settings[key] = v.trim() || DEFAULT_SETTINGS[key];
+          this.plugin.settings[key] = v.trim() ? notePath(v) : DEFAULT_SETTINGS[key];
           await this.plugin.saveSettings();
         }),
       );

@@ -4,7 +4,7 @@ import { airQualityUrl, forecastUrl, geocodeUrl, parseAqi, parseForecast, parseG
 import { loadPanel, type PanelState } from "../data/panelLoader";
 import { fetchJson } from "../obsidian/http";
 import type { HomeView } from "./HomeView";
-import { panelFrame, renderStatus } from "./panel";
+import { aliveFlag, panelFrame, renderStatus, TICK_MS } from "./panel";
 
 const WEATHER_MS = 15 * 60_000;
 interface WeatherData { weather: Weather; aqi: number | null }
@@ -17,9 +17,11 @@ export function mountWeather(view: HomeView, panelEl: HTMLElement, bannerLineEl:
   const { plugin } = view;
   const cfg = plugin.configStore.config!.weather;
   const sec = view.section();
+  const alive = aliveFlag(sec);
   const f = panelFrame(panelEl, "Weather");
 
   const start = (lat: number, lon: number, label: string) => {
+    if (!alive()) return;
     f.label.firstElementChild!.setText(`Weather · ${label}`);
     const load = (force: boolean) =>
       loadPanel<WeatherData>({
@@ -27,6 +29,7 @@ export function mountWeather(view: HomeView, panelEl: HTMLElement, bannerLineEl:
         key: `weather:${lat},${lon},${cfg.units}`,
         maxAgeMs: WEATHER_MS,
         force,
+        isValid: (v) => Array.isArray((v as WeatherData | null)?.weather?.daily),
         fetch: async () => {
           const [fc, aq] = await Promise.all([
             fetchJson(forecastUrl(lat, lon, cfg.units)),
@@ -38,11 +41,12 @@ export function mountWeather(view: HomeView, panelEl: HTMLElement, bannerLineEl:
         },
         onUpdate: (s) => draw(s),
       });
-    sec.registerInterval(window.setInterval(() => void load(false), WEATHER_MS));
+    sec.registerInterval(window.setInterval(() => void load(false), TICK_MS));
     void load(view.forceNext);
   };
 
   const draw = (s: PanelState<WeatherData>) => {
+    if (!alive()) return;
     renderStatus(f.status, s);
     if (!s.data) return;
     drawPanel(f.body, s.data, cfg.units);

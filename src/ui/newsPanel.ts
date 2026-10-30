@@ -1,13 +1,13 @@
 // News groups. Feed content is untrusted: every string goes in as text, and
 // links/images are only used when they are plain http(s) URLs.
-import type { NewsGroupConfig } from "../core/config";
+import { groupCacheKey, type NewsGroupConfig } from "../core/config";
 import { relativeAge } from "../core/dates";
 import { mergeGroup, parseFeed, type FeedItem } from "../core/rss";
 import { isHttpUrl } from "../core/safeUrl";
 import { loadPanel, type PanelState } from "../data/panelLoader";
 import { fetchText } from "../obsidian/http";
 import type { HomeView } from "./HomeView";
-import { collapse, panelFrame, renderStatus } from "./panel";
+import { aliveFlag, collapse, panelFrame, renderStatus, TICK_MS } from "./panel";
 
 async function fetchGroup(group: NewsGroupConfig): Promise<FeedItem[]> {
   const results = await Promise.allSettled(
@@ -60,10 +60,12 @@ function drawList(body: HTMLElement, items: FeedItem[], now: number): HTMLElemen
 
 export function mountNewsGroup(view: HomeView, el: HTMLElement, group: NewsGroupConfig): void {
   const sec = view.section();
+  const alive = aliveFlag(sec);
   const f = panelFrame(el, group.title, false);
   const maxAgeMs = group.cacheMinutes * 60_000;
 
   const draw = (s: PanelState<FeedItem[]>) => {
+    if (!alive()) return;
     renderStatus(f.status, s);
     if (!s.data) return;
     f.body.empty();
@@ -80,7 +82,15 @@ export function mountNewsGroup(view: HomeView, el: HTMLElement, group: NewsGroup
   };
 
   const load = (force: boolean) =>
-    loadPanel({ cache: view.plugin.cache, key: `news:${group.title}`, maxAgeMs, force, fetch: () => fetchGroup(group), onUpdate: draw });
-  sec.registerInterval(window.setInterval(() => void load(false), maxAgeMs));
+    loadPanel({
+      cache: view.plugin.cache,
+      key: groupCacheKey("news", group.title, [group.style, String(group.limit), ...group.feeds.flatMap((f) => [f.url, f.title, String(f.limit)])]),
+      maxAgeMs,
+      force,
+      isValid: Array.isArray,
+      fetch: () => fetchGroup(group),
+      onUpdate: draw,
+    });
+  sec.registerInterval(window.setInterval(() => void load(false), TICK_MS));
   void load(view.forceNext);
 }

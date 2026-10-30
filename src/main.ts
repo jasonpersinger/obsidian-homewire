@@ -1,4 +1,5 @@
 import { Plugin } from "obsidian";
+import { notePath } from "./core/config";
 import { Cache } from "./data/cache";
 import { ConfigStore } from "./obsidian/configStore";
 import { createHomepage } from "./obsidian/createHomepage";
@@ -13,7 +14,8 @@ export default class SalamanderHomePlugin extends Plugin {
   readonly views = new Set<HomeView>();
 
   async onload(): Promise<void> {
-    this.settings = { ...DEFAULT_SETTINGS, ...((await this.loadData()) as Partial<SalamanderHomeSettings> | null) };
+    const saved = { ...DEFAULT_SETTINGS, ...((await this.loadData()) as Partial<SalamanderHomeSettings> | null) };
+    this.settings = { homePath: notePath(saved.homePath), configPath: notePath(saved.configPath), billsPath: notePath(saved.billsPath) };
     this.cache = new Cache({
       load: (k) => this.app.loadLocalStorage(k) as unknown,
       save: (k, v) => this.app.saveLocalStorage(k, v),

@@ -79,3 +79,18 @@ describe("loadPanel", () => {
     expect(b.at(-1)!.data).toBe("shared");
   });
 });
+
+test("cached data failing isValid is treated as missing (old shape after an upgrade)", async () => {
+  const { cache, states, onUpdate } = setup();
+  cache.set("k", { old: "shape" } as unknown as string);
+  await loadPanel({ cache, key: "k", maxAgeMs: 5 * MIN, isValid: (v) => typeof v === "string", fetch: async () => "new", onUpdate });
+  expect(states[0]).toEqual({ data: null, fetchedAt: null, error: null, loading: true });
+  expect(states.at(-1)!.data).toBe("new");
+});
+
+test("a failed cache save still shows the fresh data", async () => {
+  const cache = new Cache({ load: () => null, save: () => { throw new Error("quota"); } }, "t", () => 0);
+  const states: PanelState<string>[] = [];
+  await loadPanel({ cache, key: "k", maxAgeMs: MIN, fetch: async () => "new", onUpdate: (s) => states.push(s) });
+  expect(states.at(-1)).toMatchObject({ data: "new", error: null, loading: false });
+});

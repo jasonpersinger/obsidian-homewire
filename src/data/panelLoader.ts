@@ -13,9 +13,12 @@ export async function loadPanel<T>(opts: {
   fetch: () => Promise<T>;
   onUpdate: (s: PanelState<T>) => void;
   force?: boolean;
+  /** Rejects cached values of an outdated shape (e.g. written by an older plugin version). */
+  isValid?: (value: unknown) => boolean;
 }): Promise<void> {
   const { cache, key, onUpdate } = opts;
-  const cached = cache.get<T>(key);
+  const stored = cache.get<T>(key);
+  const cached = stored && (!opts.isValid || opts.isValid(stored.value)) ? stored : null;
   const fresh = cached !== null && cache.now() - cached.fetchedAt < opts.maxAgeMs;
   const base = { data: cached?.value ?? null, fetchedAt: cached?.fetchedAt ?? null };
 
@@ -29,7 +32,11 @@ export async function loadPanel<T>(opts: {
   let pending = inFlight.get(id) as Promise<T> | undefined;
   if (!pending) {
     pending = opts.fetch().then((value) => {
-      cache.set(key, value);
+      try {
+        cache.set(key, value);
+      } catch {
+        // Storage full or unavailable: still show the fresh data.
+      }
       return value;
     });
     inFlight.set(id, pending);
@@ -37,9 +44,8 @@ export async function loadPanel<T>(opts: {
   }
 
   try {
-    await pending;
-    const saved = cache.get<T>(key)!;
-    onUpdate({ data: saved.value, fetchedAt: saved.fetchedAt, error: null, loading: false });
+    const value = await pending;
+    onUpdate({ data: value, fetchedAt: cache.get<T>(key)?.fetchedAt ?? cache.now(), error: null, loading: false });
   } catch (e) {
     onUpdate({ ...base, error: e instanceof Error ? e.message : String(e), loading: false });
   }

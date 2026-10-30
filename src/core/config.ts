@@ -46,9 +46,10 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
     if (!isStr(v)) errors.push(`${path} must be a non-empty string`);
     return isStr(v) ? v : "";
   };
-  const num = (v: unknown, path: string, fallback: number): number => {
+  const num = (v: unknown, path: string, fallback: number, min = -Infinity): number => {
     if (v === undefined) return fallback;
     if (typeof v !== "number" || !Number.isFinite(v)) errors.push(`${path} must be a number`);
+    else if (v < min) errors.push(`${path} must be at least ${min}`);
     return typeof v === "number" ? v : fallback;
   };
   const list = (v: unknown, path: string): unknown[] => {
@@ -118,16 +119,16 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
         return { url: "", title: "" };
       }
       const feed: FeedConfig = { url: str(f.url, `${fp}.url`), title: str(f.title, `${fp}.title`) };
-      if (f.limit !== undefined) feed.limit = num(f.limit, `${fp}.limit`, 0);
+      if (f.limit !== undefined) feed.limit = num(f.limit, `${fp}.limit`, 0, 0);
       return feed;
     });
     if (feeds.length === 0) errors.push(`${p}.feeds must list at least one feed`);
     return {
       title: str(g.title, `${p}.title`),
       style,
-      limit: num(g.limit, `${p}.limit`, 14),
-      collapseAfter: num(g.collapseAfter, `${p}.collapseAfter`, 6),
-      cacheMinutes: num(g.cacheMinutes, `${p}.cacheMinutes`, 15),
+      limit: num(g.limit, `${p}.limit`, 14, 0),
+      collapseAfter: num(g.collapseAfter, `${p}.collapseAfter`, 6, 0),
+      cacheMinutes: num(g.cacheMinutes, `${p}.cacheMinutes`, 15, 1),
       feeds,
     };
   });
@@ -141,7 +142,7 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
     }
     return {
       title: str(g.title, `${p}.title`),
-      collapseAfter: num(g.collapseAfter, `${p}.collapseAfter`, 6),
+      collapseAfter: num(g.collapseAfter, `${p}.collapseAfter`, 6, 0),
       markets: list(g.markets, `${p}.markets`).map((m, j) => {
         const mp = `${p}.markets[${j}]`;
         if (!isObj(m)) {
@@ -155,6 +156,22 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
 
   if (errors.length) return { config: null, errors };
   return { config: { weather, buttons, news, markets }, errors };
+}
+
+/** Cache key that changes whenever the group's sources change, not just its title. */
+export function groupCacheKey(kind: string, title: string, parts: string[]): string {
+  let h = 0x811c9dc5; // FNV-1a
+  for (const ch of parts.join("\n")) {
+    h ^= ch.charCodeAt(0);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return `${kind}:${title}:${h.toString(36)}`;
+}
+
+/** A vault note path from a user-typed setting: slashes collapsed, no leading slash, `.md` added. */
+export function notePath(raw: string): string {
+  const p = raw.trim().replace(/\\/g, "/").replace(/\/+/g, "/").replace(/^\/|\/$/g, "");
+  return p.toLowerCase().endsWith(".md") ? p : `${p}.md`;
 }
 
 export const DEFAULT_CONFIG_NOTE = `This note configures your Salamander Home page. Edit the YAML below; the page updates when you save.

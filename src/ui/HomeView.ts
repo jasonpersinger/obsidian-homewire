@@ -12,6 +12,7 @@ import { mountCalendar } from "./calendarPanel";
 import { mountMarketGroup } from "./marketsPanel";
 import { mountNewsGroup } from "./newsPanel";
 import { mountToday } from "./todayPanel";
+import { panelError } from "./panel";
 import { mountWeather } from "./weatherPanel";
 
 export class HomeView extends MarkdownRenderChild {
@@ -99,7 +100,7 @@ export class HomeView extends MarkdownRenderChild {
       root.addClass("sh-root");
       root.createDiv({
         cls: "sh-notice sh-neg",
-        text: `SalamanderHome Error: ${err instanceof Error ? err.stack || err.message : String(err)}`,
+        text: `Salamander Home error: ${err instanceof Error ? err.message : String(err)} (details in the developer console)`,
       });
     }
   }
@@ -107,11 +108,20 @@ export class HomeView extends MarkdownRenderChild {
   private mountPanels(): void {
     const { left, center, right } = this.slots;
     const config = this.plugin.configStore.config!;
-    mountWeather(this, left, this.slots.bannerWeather);
-    mountToday(this, left);
-    for (const group of config.news) mountNewsGroup(this, center, group);
-    const calendar = mountCalendar(this, right);
-    mountBills(this, right, (dates) => calendar.setBillDates(dates));
-    for (const group of config.markets) mountMarketGroup(this, right, group);
+    // Each panel fails on its own: one throwing while mounting leaves the rest intact.
+    const guard = (el: HTMLElement, title: string, mount: () => void) => {
+      try {
+        mount();
+      } catch (e) {
+        panelError(el, title, e);
+      }
+    };
+    guard(left, "Weather", () => mountWeather(this, left, this.slots.bannerWeather));
+    guard(left, "Today", () => mountToday(this, left));
+    for (const group of config.news) guard(center, group.title, () => mountNewsGroup(this, center, group));
+    let calendar: { setBillDates(d: Set<string>): void } | null = null;
+    guard(right, "Calendar", () => (calendar = mountCalendar(this, right)));
+    guard(right, "Bills", () => mountBills(this, right, (dates) => calendar?.setBillDates(dates)));
+    for (const group of config.markets) guard(right, group.title, () => mountMarketGroup(this, right, group));
   }
 }

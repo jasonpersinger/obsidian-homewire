@@ -4,7 +4,7 @@ import { dailyNotesAvailable, getDailyNoteFile, today } from "../obsidian/dailyN
 import { toggleTaskInFile } from "../obsidian/vaultEdits";
 import { openAddTask } from "./buttons";
 import type { HomeView } from "./HomeView";
-import { panelFrame } from "./panel";
+import { aliveFlag, panelError, panelFrame } from "./panel";
 
 const LOOKBACK_DAYS = 7;
 
@@ -12,6 +12,7 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
   const { plugin } = view;
   const { app } = plugin;
   const sec = view.section();
+  const alive = aliveFlag(sec);
   const f = panelFrame(panelEl, "Today");
   f.label.createEl("a", { cls: "sh-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
     e.preventDefault();
@@ -37,6 +38,7 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
       }
     }
 
+    if (!alive()) return;
     f.body.empty();
     if (items.length === 0) {
       f.body.createDiv({ cls: "sh-muted", text: "Nothing open." });
@@ -53,11 +55,12 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
       });
     }
   };
-  const redraw = debounce(() => void draw(), 300, true);
+  const safeDraw = () => draw().catch((e) => alive() && (f.body.empty(), panelError(f.body, "Today", e)));
+  const redraw = debounce(() => void safeDraw(), 300, true);
 
   const isDaily = (file: unknown) => file instanceof TFile && (watched.has(file.path) || getDailyNoteFile(app, today())?.path === file.path);
   sec.registerEvent(app.vault.on("modify", (file) => isDaily(file) && redraw()));
   sec.registerEvent(app.vault.on("create", (file) => isDaily(file) && redraw()));
   sec.registerEvent(app.vault.on("delete", (file) => file instanceof TFile && watched.has(file.path) && redraw()));
-  void draw();
+  void safeDraw();
 }

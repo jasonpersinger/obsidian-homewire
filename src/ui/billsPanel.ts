@@ -4,7 +4,7 @@ import { localYmd } from "../core/dates";
 import { toggleTaskInFile } from "../obsidian/vaultEdits";
 import { openAddBill } from "./buttons";
 import type { HomeView } from "./HomeView";
-import { panelFrame } from "./panel";
+import { aliveFlag, panelError, panelFrame } from "./panel";
 
 function dueText(b: Bill, todayYmd: string): { text: string; cls: string } {
   const s = billStatus(b.due, todayYmd);
@@ -21,6 +21,7 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
   const { app } = plugin;
   const path = () => plugin.settings.billsPath;
   const sec = view.section();
+  const alive = aliveFlag(sec);
   const f = panelFrame(el, "Bills");
   f.label.createEl("a", { cls: "sh-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
     e.preventDefault();
@@ -28,9 +29,10 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
   });
 
   const draw = async () => {
-    f.body.empty();
     const file = app.vault.getFileByPath(path());
     const unpaid = file ? parseBills(await app.vault.cachedRead(file)).filter((b) => !b.paid).sort((a, b) => a.due.localeCompare(b.due)) : [];
+    if (!alive()) return;
+    f.body.empty();
     onBillsChanged(new Set(unpaid.map((b) => b.due)));
     if (unpaid.length === 0) {
       f.body.createDiv({ cls: "sh-muted", text: file ? "Nothing due." : "No bills yet." });
@@ -55,12 +57,13 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
       right.createSpan({ cls: due.cls, text: due.text });
     }
   };
-  const redraw = debounce(() => void draw(), 300, true);
+  const safeDraw = () => draw().catch((e) => alive() && (f.body.empty(), panelError(f.body, "Bills", e)));
+  const redraw = debounce(() => void safeDraw(), 300, true);
 
   const isBills = (file: unknown, oldPath?: string) => file instanceof TFile && (file.path === path() || oldPath === path());
   sec.registerEvent(app.vault.on("modify", (file) => isBills(file) && redraw()));
   sec.registerEvent(app.vault.on("create", (file) => isBills(file) && redraw()));
   sec.registerEvent(app.vault.on("delete", (file) => isBills(file) && redraw()));
   sec.registerEvent(app.vault.on("rename", (file, old) => isBills(file, old) && redraw()));
-  void draw();
+  void safeDraw();
 }
