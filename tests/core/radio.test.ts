@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import fixture from "../fixtures/azuracast-nowplaying.json";
-import { formatTime, nowPlayingUrl, parseNowPlaying, progress } from "../../src/core/radio";
+import { formatTime, normalizeVolume, nowPlayingUrl, parseNowPlaying, progress, volumeIcon } from "../../src/core/radio";
 
 describe("parseNowPlaying (AzuraCast)", () => {
   const np = parseNowPlaying(fixture)!;
@@ -49,5 +49,25 @@ describe("progress and time", () => {
   });
   test("now-playing url from server and station", () => {
     expect(nowPlayingUrl("https://kobold.messy.quest/", "kobold.fm")).toBe("https://kobold.messy.quest/api/nowplaying/kobold.fm");
+  });
+});
+
+describe("normalizeVolume (saved per device)", () => {
+  test("keeps a valid level", () => expect(normalizeVolume(0.35)).toBe(0.35));
+  test("clamps out-of-range values", () => {
+    expect(normalizeVolume(1.7)).toBe(1);
+    expect(normalizeVolume(-0.2)).toBe(0);
+  });
+  test("anything unreadable falls back to 80%", () => {
+    for (const v of [null, undefined, "loud", NaN, {}]) expect(normalizeVolume(v)).toBe(0.8);
+  });
+});
+
+describe("volumeIcon", () => {
+  test("muted, low and high", () => {
+    expect(volumeIcon(0.5, true)).toBe("volume-x");
+    expect(volumeIcon(0, false)).toBe("volume-x");
+    expect(volumeIcon(0.3, false)).toBe("volume-1");
+    expect(volumeIcon(0.8, false)).toBe("volume-2");
   });
 });

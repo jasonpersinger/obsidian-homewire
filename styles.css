@@ -434,3 +434,28 @@
   .hw-root .hw-radio-play.is-playing .hw-eq span,
   .hw-root .hw-radio-play.is-loading .hw-radio-btn-text { animation: none; height: 70%; }
 }
+
+/* Radio controls: Listen button + volume on one row */
+.hw-root .hw-radio-controls { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
+.hw-root .hw-radio-controls .hw-radio-play { flex: 1; }
+.hw-root .hw-radio-volume { flex: 0 0 120px; display: flex; align-items: center; gap: 4px; }
+.hw-root .hw-radio-mute { padding: 2px; color: var(--text-muted); }
+.hw-root .hw-radio-mute svg { width: 16px; height: 16px; }
+.hw-root .hw-radio-slider {
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  margin: 0;
+  appearance: none;
+  border-radius: 0;
+  background: linear-gradient(90deg, var(--hw-accent) var(--level, 80%), var(--background-modifier-hover) var(--level, 80%));
+  cursor: pointer;
+}
+.hw-root .hw-radio-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 14px;
+  border: 0;
+  border-radius: 0;
+  background: var(--text-normal);
+}

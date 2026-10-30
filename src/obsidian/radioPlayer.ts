@@ -1,14 +1,42 @@
 // One audio player for the whole plugin, so music keeps going when the homepage
 // re-renders or you switch notes. Panels only control it and listen for "change".
 import { Events } from "obsidian";
+import { normalizeVolume } from "../core/radio";
 import { isHttpUrl } from "../core/safeUrl";
 
 export type RadioState = "stopped" | "loading" | "playing" | "error";
 
+export interface VolumeStore { load(): unknown; save(volume: number): void }
+
 export class RadioPlayer extends Events {
   state: RadioState = "stopped";
   url: string | null = null;
+  volume: number;
+  muted = false;
   private audio: HTMLAudioElement | null = null;
+
+  /** Volume is remembered per device (not synced), through the given store. */
+  constructor(private readonly store: VolumeStore) {
+    super();
+    this.volume = normalizeVolume(store.load());
+  }
+
+  setVolume(volume: number): void {
+    this.volume = normalizeVolume(volume);
+    this.muted = this.volume === 0;
+    if (this.audio) {
+      this.audio.volume = this.volume;
+      this.audio.muted = this.muted;
+    }
+    this.store.save(this.volume);
+    this.trigger("volume");
+  }
+
+  toggleMute(): void {
+    this.muted = !this.muted;
+    if (this.audio) this.audio.muted = this.muted;
+    this.trigger("volume");
+  }
 
   private set(state: RadioState): void {
     this.state = state;
@@ -20,6 +48,8 @@ export class RadioPlayer extends Events {
     this.stop();
     const audio = new Audio();
     audio.preload = "none";
+    audio.volume = this.volume;
+    audio.muted = this.muted;
     audio.addEventListener("playing", () => this.set("playing"));
     audio.addEventListener("waiting", () => this.set("loading"));
     audio.addEventListener("error", () => this.set("error"));

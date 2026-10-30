@@ -1,7 +1,7 @@
 // Radio card: art, artist/title, progress, up next, listeners, LIVE badge, play/stop.
-import { setIcon } from "obsidian";
+import { Platform, setIcon } from "obsidian";
 import type { RadioConfig } from "../core/config";
-import { formatTime, nowPlayingUrl, parseNowPlaying, progress, type NowPlaying } from "../core/radio";
+import { formatTime, nowPlayingUrl, parseNowPlaying, progress, volumeIcon, type NowPlaying } from "../core/radio";
 import { loadPanel, type PanelState } from "../data/panelLoader";
 import { fetchJson } from "../obsidian/http";
 import type { HomeView } from "./HomeView";
@@ -26,11 +26,33 @@ export function mountRadio(view: HomeView, el: HTMLElement, cfg: RadioConfig): v
   const bar = info.createDiv({ cls: "hw-radio-bar" }).createDiv({ cls: "hw-radio-fill" });
   const times = info.createDiv({ cls: "hw-radio-times hw-faint" });
   const next = f.body.createDiv({ cls: "hw-radio-next hw-faint hw-ellipsis" });
-  const button = f.body.createEl("button", { cls: "hw-radio-play", attr: { "aria-label": "Play" } });
+  const controls = f.body.createDiv({ cls: "hw-radio-controls" });
+  const button = controls.createEl("button", { cls: "hw-radio-play", attr: { "aria-label": "Play" } });
   const icon = button.createSpan({ cls: "hw-radio-icon" });
   const eq = button.createSpan({ cls: "hw-eq" });
   for (let i = 0; i < 4; i++) eq.createSpan();
   const buttonText = button.createSpan({ cls: "hw-radio-btn-text" });
+
+  // Volume: iOS doesn't let apps set audio volume (hardware buttons only), so no slider there.
+  if (!Platform.isIosApp) {
+    const vol = controls.createDiv({ cls: "hw-radio-volume" });
+    const speaker = vol.createEl("button", { cls: "hw-radio-mute clickable-icon", attr: { "aria-label": "Mute" } });
+    const slider = vol.createEl("input", {
+      cls: "hw-radio-slider",
+      type: "range",
+      attr: { min: "0", max: "1", step: "0.01", "aria-label": "Volume" },
+    });
+    const drawVolume = () => {
+      setIcon(speaker, volumeIcon(player.volume, player.muted));
+      speaker.setAttr("aria-label", player.muted ? "Unmute" : "Mute");
+      slider.value = String(player.muted ? 0 : player.volume);
+      slider.style.setProperty("--level", `${(player.muted ? 0 : player.volume) * 100}%`);
+    };
+    slider.addEventListener("input", () => player.setVolume(Number(slider.value)));
+    speaker.addEventListener("click", () => player.toggleMute());
+    sec.registerEvent(player.on("volume", drawVolume));
+    drawVolume();
+  }
 
   let np: NowPlaying | null = null;
   const streamUrl = () => cfg.stream ?? np?.stream ?? null;

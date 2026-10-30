@@ -13,7 +13,10 @@ export default class HomewirePlugin extends Plugin {
   configStore!: ConfigStore;
   cache!: Cache;
   readonly views = new Set<HomeView>();
-  readonly radio = new RadioPlayer();
+  readonly radio = new RadioPlayer({
+    load: () => this.app.loadLocalStorage("homewire:radio-volume") as unknown,
+    save: (v) => this.app.saveLocalStorage("homewire:radio-volume", v),
+  });
 
   async onload(): Promise<void> {
     const saved = { ...DEFAULT_SETTINGS, ...((await this.loadData()) as Partial<HomewireSettings> | null) };

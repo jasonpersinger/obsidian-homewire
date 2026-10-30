@@ -59,3 +59,14 @@ export function formatTime(seconds: number): string {
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = String(s % 60).padStart(2, "0");
   return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${sec}` : `${m}:${sec}`;
 }
+
+/** A saved volume (0–1); anything unreadable becomes 80%. */
+export function normalizeVolume(value: unknown): number {
+  if (typeof value !== "number" || Number.isNaN(value)) return 0.8;
+  return Math.min(1, Math.max(0, value));
+}
+
+export function volumeIcon(volume: number, muted: boolean): "volume-x" | "volume-1" | "volume-2" {
+  if (muted || volume === 0) return "volume-x";
+  return volume < 0.5 ? "volume-1" : "volume-2";
+}
