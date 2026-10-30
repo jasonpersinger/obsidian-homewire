@@ -1,5 +1,16 @@
 import { describe, expect, test } from "vitest";
-import { billStatus, formatBillLine, parseBills } from "../../src/core/bills";
+import { billStatus, formatBillLine, parseAmount, parseBills } from "../../src/core/bills";
+
+describe("parseAmount (add-bill form)", () => {
+  test.each([
+    ["142.18", 142.18],
+    ["$142.18", 142.18],
+    ["1,204.50", 1204.5],
+    [" 40 ", 40],
+  ])("%s → %s", (raw, n) => expect(parseAmount(raw)).toBe(n));
+  test("empty means no amount", () => expect(parseAmount("  ")).toBeNull());
+  test.each(["abc", "1.234", "-5", "12.3.4"])("%s is invalid", (raw) => expect(parseAmount(raw)).toBe("invalid"));
+});
 
 const fixture = [
   "- [ ] Electric · $142.18 · due 2026-11-03",

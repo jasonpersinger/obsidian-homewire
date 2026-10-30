@@ -10,6 +10,9 @@ import {
 } from "obsidian-daily-notes-interface";
 import { ensureFolder } from "./vaultEdits";
 
+/** "Now" as a Moment. Obsidian's `moment` export isn't typed as callable under bundler resolution. */
+export const today = (): moment.Moment => (moment as unknown as () => moment.Moment)();
+
 export function dailyNotesAvailable(): boolean {
   return appHasDailyNotesPluginLoaded();
 }

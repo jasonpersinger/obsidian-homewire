@@ -1,1 +1,133 @@
-/* Salamander Home — Glance-style homepage panels. Classes are prefixed `sh-`. */
+/* Salamander Home — Glance-style homepage panels. Classes are prefixed `sh-`.
+   Colors come from the Salamander theme when present, with Obsidian fallbacks. */
+
+.sh-root {
+  --sh-accent: var(--color-accent);
+  --sh-accent-1: var(--color-accent-1, var(--color-accent));
+  --sh-secondary: var(--salamander-secondary, var(--color-green));
+  --sh-tertiary: var(--salamander-tertiary, var(--color-yellow));
+  --sh-pos: var(--salamander-success, var(--color-green));
+  --sh-neg: var(--salamander-danger, var(--color-red));
+  --sh-panel: var(--background-secondary);
+  --sh-line: var(--background-modifier-border);
+  container-type: inline-size;
+  font-family: var(--font-monospace);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-normal);
+}
+
+/* Full-width note, no inline title */
+.sh-home .markdown-preview-sizer,
+.sh-home .cm-sizer {
+  max-width: none;
+}
+.sh-home .inline-title {
+  display: none;
+}
+
+/* ── Shared ─────────────────────────────────────────────── */
+.sh-root .sh-accent { color: var(--sh-accent); }
+.sh-root .sh-muted { color: var(--text-muted); }
+.sh-root .sh-faint { color: var(--text-faint); font-size: 0.85em; }
+.sh-root .sh-pos { color: var(--sh-pos); }
+.sh-root .sh-neg, .modal .sh-neg { color: var(--sh-neg); }
+.sh-root .sh-notice { margin: 8px 0; }
+.sh-root .sh-link { color: var(--sh-accent); cursor: pointer; text-decoration: none; }
+.sh-root .sh-link:hover { color: var(--sh-accent-1); text-decoration: underline; }
+
+.sh-root .sh-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 16px 0 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.sh-root .sh-col > .sh-section:first-child .sh-label { margin-top: 0; }
+
+.sh-root .sh-box {
+  background: var(--sh-panel);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--radius-s);
+  padding: 9px 11px;
+}
+
+.sh-root .sh-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--sh-line);
+}
+.sh-root .sh-row:last-child { border-bottom: 0; }
+
+.sh-root .sh-more {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 4px 0 0;
+  color: var(--text-faint);
+  font-size: 0.8em;
+  cursor: pointer;
+}
+.sh-root .sh-more:hover { color: var(--sh-accent); }
+
+/* ── Banner ─────────────────────────────────────────────── */
+.sh-root .sh-banner {
+  border-left: 3px solid var(--sh-accent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sh-accent) 10%, transparent), transparent 65%);
+  padding: 14px 16px 12px;
+  margin-bottom: 18px;
+}
+.sh-root .sh-date {
+  font-family: var(--font-heading-theme, var(--font-interface));
+  font-size: 1.7em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-normal);
+  line-height: 1.15;
+}
+.sh-root .sh-date .sh-accent { font-weight: 700; }
+.sh-root .sh-sub { color: var(--text-muted); font-size: 0.85em; margin-top: 4px; }
+.sh-root .sh-banner-weather:not(:empty)::before { content: "   "; white-space: pre; }
+
+.sh-root .sh-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sh-root .sh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: auto;
+  padding: 5px 11px;
+  border: 1px solid var(--sh-line);
+  border-radius: var(--radius-s);
+  background: var(--sh-panel);
+  box-shadow: none;
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.sh-root .sh-btn:hover { border-color: var(--sh-accent); color: var(--sh-accent); }
+.sh-root .sh-btn-primary { border-color: var(--sh-accent); color: var(--sh-accent); }
+.sh-root .sh-btn-icon { display: inline-flex; }
+.sh-root .sh-btn-icon svg { width: 14px; height: 14px; }
+
+/* ── Columns ────────────────────────────────────────────── */
+.sh-root .sh-cols {
+  display: grid;
+  grid-template-columns: 1fr 2.3fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.sh-root .sh-col { min-width: 0; }
+
+@container (max-width: 900px) {
+  .sh-root .sh-cols { grid-template-columns: 1fr; }
+}

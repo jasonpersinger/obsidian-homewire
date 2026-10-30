@@ -29,6 +29,13 @@ export function formatBillLine(input: { name: string; amount: number | null; due
   return `- [ ] ${name}${amount} · due ${input.due}`;
 }
 
+/** Parses "142.18", "$142.18" or "1,204.50"; blank means no amount. */
+export function parseAmount(raw: string): number | null | "invalid" {
+  const s = raw.replace(/[$,\s]/g, "");
+  if (!s) return null;
+  return /^\d+(\.\d{1,2})?$/.test(s) ? Number(s) : "invalid";
+}
+
 export function billStatus(due: string, today: string): BillStatus {
   const d = daysBetween(today, due);
   if (d < 0) return { kind: "late", days: -d };
