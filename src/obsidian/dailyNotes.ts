@@ -24,19 +24,34 @@ export function dailyNotePath(date: moment.Moment): string {
 }
 
 export function getDailyNoteFile(app: App, date: moment.Moment): TFile | null {
-  return app.vault.getFileByPath(dailyNotePath(date)) ?? getDailyNote(date, getAllDailyNotes()) ?? null;
+  const direct = app.vault.getFileByPath(dailyNotePath(date));
+  if (direct) return direct;
+  try {
+    return getDailyNote(date, getAllDailyNotes()) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getOrCreateDailyNote(app: App, date: moment.Moment): Promise<TFile> {
   const existing = getDailyNoteFile(app, date);
   if (existing) return existing;
-  const { template } = getDailyNoteSettings();
-  const templateExists = !!template && !!app.metadataCache.getFirstLinkpathDest(template, "");
-  if (templateExists) {
-    const created = await createDailyNote(date);
-    if (created) return created;
+  let templateExists = false;
+  try {
+    const { template } = getDailyNoteSettings();
+    templateExists = !!template && !!app.metadataCache.getFirstLinkpathDest(template, "");
+  } catch {
+    templateExists = false;
   }
-  // No usable template: create an empty note ourselves (the library would show an error notice).
+  if (templateExists) {
+    try {
+      const created = await createDailyNote(date);
+      if (created) return created;
+    } catch {
+      // Fall through to manual creation
+    }
+  }
+  // No usable template or folder missing: create note ourselves
   const path = dailyNotePath(date);
   await ensureFolder(app, path);
   return app.vault.create(path, "");
@@ -44,9 +59,13 @@ export async function getOrCreateDailyNote(app: App, date: moment.Moment): Promi
 
 export function daysWithDailyNotes(): Set<string> {
   const out = new Set<string>();
-  for (const f of Object.values(getAllDailyNotes())) {
-    const d = getDateFromFile(f, "day");
-    if (d) out.add(d.format("YYYY-MM-DD"));
+  try {
+    for (const f of Object.values(getAllDailyNotes())) {
+      const d = getDateFromFile(f, "day");
+      if (d) out.add(d.format("YYYY-MM-DD"));
+    }
+  } catch {
+    // Daily notes folder does not exist yet or no notes found
   }
   return out;
 }

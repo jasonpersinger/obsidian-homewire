@@ -53,40 +53,51 @@ export class HomeView extends MarkdownRenderChild {
   forceNext = false;
 
   render(): void {
-    if (this.generation) this.removeChild(this.generation);
-    this.generation = this.addChild(new Component());
-    this.renderedDay = localYmd(new Date());
+    try {
+      if (this.generation) this.removeChild(this.generation);
+      this.generation = this.addChild(new Component());
+      this.renderedDay = localYmd(new Date());
 
-    const root = this.containerEl;
-    root.empty();
-    root.addClass("sh-root");
-    const store = this.plugin.configStore;
-    const openDaily = () => void getOrCreateDailyNote(this.plugin.app, today())
-      .then((f) => this.plugin.app.workspace.getLeaf(false).openFile(f));
+      const root = this.containerEl;
+      root.empty();
+      root.addClass("sh-root");
+      const store = this.plugin.configStore;
+      const openDaily = () => void getOrCreateDailyNote(this.plugin.app, today())
+        .then((f) => this.plugin.app.workspace.getLeaf(false).openFile(f));
 
-    const banner = root.createDiv({ cls: "sh-banner" });
-    const bannerWeather = renderBanner(banner, new Date(), [{ label: "daily note", onClick: openDaily }]);
+      const banner = root.createDiv({ cls: "sh-banner" });
+      const bannerWeather = renderBanner(banner, new Date(), [{ label: "daily note", onClick: openDaily }]);
 
-    if (store.missing || !store.config) {
+      if (store.missing || !store.config) {
+        root.createDiv({
+          cls: "sh-muted sh-notice",
+          text: store.missing
+            ? "No config note found. Run “Salamander Home: Create homepage”."
+            : store.error ?? "Loading config…",
+        });
+        return;
+      }
+      renderButtons(banner.createDiv({ cls: "sh-buttons" }), store.config.buttons, (a) => runButtonAction(this.plugin, a));
+      if (store.error) root.createDiv({ cls: "sh-faint sh-notice", text: store.error });
+
+      const cols = root.createDiv({ cls: "sh-cols" });
+      this.slots = {
+        bannerWeather,
+        left: cols.createDiv({ cls: "sh-col sh-col-left" }),
+        center: cols.createDiv({ cls: "sh-col sh-col-center" }),
+        right: cols.createDiv({ cls: "sh-col sh-col-right" }),
+      };
+      this.mountPanels();
+    } catch (err) {
+      console.error("SalamanderHome render error:", err);
+      const root = this.containerEl;
+      root.empty();
+      root.addClass("sh-root");
       root.createDiv({
-        cls: "sh-muted sh-notice",
-        text: store.missing
-          ? "No config note found. Run “Salamander Home: Create homepage”."
-          : store.error ?? "Loading config…",
+        cls: "sh-notice sh-neg",
+        text: `SalamanderHome Error: ${err instanceof Error ? err.stack || err.message : String(err)}`,
       });
-      return;
     }
-    renderButtons(banner.createDiv({ cls: "sh-buttons" }), store.config.buttons, (a) => runButtonAction(this.plugin, a));
-    if (store.error) root.createDiv({ cls: "sh-faint sh-notice", text: store.error });
-
-    const cols = root.createDiv({ cls: "sh-cols" });
-    this.slots = {
-      bannerWeather,
-      left: cols.createDiv({ cls: "sh-col sh-col-left" }),
-      center: cols.createDiv({ cls: "sh-col sh-col-center" }),
-      right: cols.createDiv({ cls: "sh-col sh-col-right" }),
-    };
-    this.mountPanels();
   }
 
   private mountPanels(): void {
