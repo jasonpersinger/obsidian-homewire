@@ -39,6 +39,7 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
     }
 
     if (!alive()) return;
+    view.report({ openTasks: items.length });
     f.body.empty();
     if (items.length === 0) {
       f.body.createDiv({ cls: "hw-muted", text: "Nothing open." });

@@ -26,6 +26,8 @@ The three note paths can be changed in the plugin settings.
 banner:
   clock: true                # large clock (default true)
   marketSession: true        # US market pre-market / open / after hours / closed, NYSE holidays included (default true)
+  wire: true                 # rotating headline from all your news groups; hover to pause (default true)
+  summary: true              # one faint line: open tasks · next bill · sunset (default true)
   fearGreed: true            # CNN Fear & Greed index in the banner (default false)
 
 clippings:                   # newest notes from Obsidian Web Clipper (default shown)

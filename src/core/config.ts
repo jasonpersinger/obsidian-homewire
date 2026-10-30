@@ -20,7 +20,7 @@ export interface NewsGroupConfig {
 export interface MarketConfig { symbol: string; name: string }
 export interface MarketGroupConfig { title: string; collapseAfter: number; markets: MarketConfig[] }
 export interface WeatherConfig { place?: string; lat?: number; lon?: number; units: "imperial" | "metric" }
-export interface BannerConfig { fearGreed: boolean; clock: boolean; marketSession: boolean }
+export interface BannerConfig { fearGreed: boolean; clock: boolean; marketSession: boolean; wire: boolean; summary: boolean }
 export interface ClippingsConfig { folder: string; limit: number }
 export interface HomeConfig {
   banner: BannerConfig;
@@ -159,11 +159,11 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
   });
 
   // banner
-  const banner: BannerConfig = { fearGreed: false, clock: true, marketSession: true };
+  const banner: BannerConfig = { fearGreed: false, clock: true, marketSession: true, wire: true, summary: true };
   if (raw.banner !== undefined) {
     if (!isObj(raw.banner)) errors.push("banner must be a mapping");
     else {
-      for (const key of ["fearGreed", "clock", "marketSession"] as const) {
+      for (const key of ["fearGreed", "clock", "marketSession", "wire", "summary"] as const) {
         const v = raw.banner[key];
         if (v === undefined) continue;
         if (typeof v === "boolean") banner[key] = v;
@@ -212,6 +212,8 @@ Set \`weather.place\` (or \`lat\` and \`lon\`) to see the weather.
 banner:
   clock: true              # large clock
   marketSession: true      # US market pre-market / open / after hours / closed
+  wire: true               # rotating headline from all your news groups
+  summary: true            # one line: open tasks, next bill, sunset
   fearGreed: false         # CNN Fear & Greed index (unofficial source; may stop working)
 
 clippings:                 # newest notes saved by Obsidian Web Clipper; "false" hides the panel

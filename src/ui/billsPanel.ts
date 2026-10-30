@@ -32,6 +32,7 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
     const file = app.vault.getFileByPath(path());
     const unpaid = file ? parseBills(await app.vault.cachedRead(file)).filter((b) => !b.paid).sort((a, b) => a.due.localeCompare(b.due)) : [];
     if (!alive()) return;
+    view.report({ nextBill: unpaid[0] ? { name: unpaid[0].name, due: unpaid[0].due } : null });
     f.body.empty();
     onBillsChanged(new Set(unpaid.map((b) => b.due)));
     if (unpaid.length === 0) {

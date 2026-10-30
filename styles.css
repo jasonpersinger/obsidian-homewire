@@ -274,7 +274,7 @@
 
 /* ── Banner side (Fear & Greed) ─────────────────────────── */
 .hw-root .hw-banner { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
-.hw-root .hw-banner-main { flex: 1; min-width: 0; }
+.hw-root .hw-banner-main { flex: 0 1 auto; min-width: 0; }
 .hw-root .hw-banner-side:empty { display: none; }
 .hw-root .hw-banner-side { flex: 0 0 260px; }
 @container (max-width: 900px) {
@@ -329,3 +329,23 @@
 .hw-root .hw-session-pre .hw-session-tag,
 .hw-root .hw-session-after .hw-session-tag { color: var(--hw-tertiary); }
 .hw-root .hw-session-closed .hw-session-tag { color: var(--text-muted); }
+
+/* ── Wire (middle of the banner) ────────────────────────── */
+.hw-root .hw-banner-wire { flex: 1; min-width: 0; align-self: center; }
+.hw-root .hw-banner-wire:empty { display: none; }
+@container (max-width: 1200px) {
+  .hw-root .hw-banner { flex-wrap: wrap; }
+  .hw-root .hw-banner-wire { order: 3; flex-basis: 100%; }
+}
+.hw-root .hw-wire { border-left: 1px dashed var(--hw-line); padding-left: 16px; }
+.hw-root .hw-wire-line {
+  font-size: 1.05em;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hw-root .hw-wire-mark { color: var(--hw-accent); font-weight: 700; }
+.hw-root .hw-wire-title { text-decoration: none; }
+.hw-root .hw-wire-summary { margin-top: 6px; }

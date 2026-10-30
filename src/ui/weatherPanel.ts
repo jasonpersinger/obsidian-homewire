@@ -49,6 +49,7 @@ export function mountWeather(view: HomeView, panelEl: HTMLElement, bannerLineEl:
     if (!alive()) return;
     renderStatus(f.status, s);
     if (!s.data) return;
+    view.report({ sunset: { at: Date.parse(s.data.weather.sunset), label: clock(s.data.weather.sunset) } });
     drawPanel(f.body, s.data, cfg.units);
     drawBannerLine(bannerLineEl, s.data.weather);
   };

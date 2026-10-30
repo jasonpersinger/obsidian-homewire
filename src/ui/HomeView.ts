@@ -1,7 +1,8 @@
 // The homepage: banner on top, three Glance-style columns below.
 // Each render is a "generation": a child Component that owns every panel's
 // events and timers, so a config change tears them all down cleanly.
-import { Component, MarkdownRenderChild } from "obsidian";
+import { Component, Events, MarkdownRenderChild } from "obsidian";
+import type { FeedItem } from "../core/rss";
 import { localYmd, relativeAge } from "../core/dates";
 import type HomewirePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
@@ -17,9 +18,21 @@ import { mountNewsGroup } from "./newsPanel";
 import { mountToday } from "./todayPanel";
 import { panelError } from "./panel";
 import { mountWeather } from "./weatherPanel";
+import { mountWire } from "./wirePanel";
+
+/** What panels publish for the banner wire and day summary; reset on every render. */
+export interface Board {
+  news: Map<string, FeedItem[]>;
+  openTasks: number | null;
+  nextBill: { name: string; due: string } | null;
+  sunset: { at: number; label: string } | null;
+}
+const emptyBoard = (): Board => ({ news: new Map(), openTasks: null, nextBill: null, sunset: null });
 
 export class HomeView extends MarkdownRenderChild {
-  slots!: { bannerWeather: HTMLElement; bannerSide: HTMLElement; left: HTMLElement; center: HTMLElement; right: HTMLElement };
+  readonly board = new Events();
+  boardState: Board = emptyBoard();
+  slots!: { bannerWeather: HTMLElement; bannerWire: HTMLElement; bannerSide: HTMLElement; left: HTMLElement; center: HTMLElement; right: HTMLElement };
   private generation: Component | null = null;
   private renderedDay = "";
   /** The month the calendar shows, kept across re-renders; null means "the current month". */
@@ -54,6 +67,14 @@ export class HomeView extends MarkdownRenderChild {
     return c;
   }
 
+  /** Panels publish here; the wire re-renders on "change". */
+  report(patch: Partial<Omit<Board, "news">> & { news?: [string, FeedItem[]] }): void {
+    const { news, ...rest } = patch;
+    if (news) this.boardState.news.set(news[0], news[1]);
+    Object.assign(this.boardState, rest);
+    this.board.trigger("change");
+  }
+
   refreshAll(force: boolean): void {
     this.forceNext = force;
     this.render();
@@ -66,6 +87,7 @@ export class HomeView extends MarkdownRenderChild {
     try {
       if (this.generation) this.removeChild(this.generation);
       this.generation = this.addChild(new Component());
+      this.boardState = emptyBoard();
       this.renderedDay = localYmd(new Date());
 
       const root = this.containerEl;
@@ -77,6 +99,7 @@ export class HomeView extends MarkdownRenderChild {
 
       const bannerRow = root.createDiv({ cls: "hw-banner" });
       const banner = bannerRow.createDiv({ cls: "hw-banner-main" });
+      const bannerWire = bannerRow.createDiv({ cls: "hw-banner-wire" });
       const bannerSide = bannerRow.createDiv({ cls: "hw-banner-side" });
       const bannerWeather = renderBanner(banner, new Date(), [{ label: "daily note", onClick: openDaily }]);
 
@@ -95,6 +118,7 @@ export class HomeView extends MarkdownRenderChild {
       const cols = root.createDiv({ cls: "hw-cols" });
       this.slots = {
         bannerWeather,
+        bannerWire,
         bannerSide,
         left: cols.createDiv({ cls: "hw-col hw-col-left" }),
         center: cols.createDiv({ cls: "hw-col hw-col-center" }),
@@ -130,6 +154,8 @@ export class HomeView extends MarkdownRenderChild {
       const clip = config.clippings;
       guard(left, "Clippings", () => mountClippings(this, left, clip));
     }
+    const wireEl = this.slots.bannerWire;
+    if (config.banner.wire || config.banner.summary) guard(wireEl, "Wire", () => mountWire(this, wireEl, config.banner));
     const side = this.slots.bannerSide;
     if (config.banner.clock || config.banner.marketSession) guard(side, "Clock", () => mountClock(this, side, config.banner));
     if (config.banner.fearGreed) guard(side, "Fear & Greed", () => mountFearGreed(this, side));

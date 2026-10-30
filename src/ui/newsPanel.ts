@@ -68,6 +68,7 @@ export function mountNewsGroup(view: HomeView, el: HTMLElement, group: NewsGroup
     if (!alive()) return;
     renderStatus(f.status, s);
     if (!s.data) return;
+    view.report({ news: [group.title, s.data] });
     f.body.empty();
     const now = Date.now();
     if (group.style === "cards") {
