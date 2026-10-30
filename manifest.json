@@ -1,7 +1,7 @@
 {
   "id": "homewire",
   "name": "Homewire",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "minAppVersion": "1.8.7",
   "description": "Turn a note into a homepage with live news, markets, weather, today's tasks, bills and a calendar.",
   "author": "Jason",
