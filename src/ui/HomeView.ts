@@ -3,7 +3,7 @@
 // events and timers, so a config change tears them all down cleanly.
 import { Component, MarkdownRenderChild } from "obsidian";
 import { localYmd, relativeAge } from "../core/dates";
-import type SalamanderHomePlugin from "../main";
+import type HomewirePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
 import { renderBanner } from "./banner";
 import { renderButtons, runButtonAction } from "./buttons";
@@ -20,7 +20,7 @@ export class HomeView extends MarkdownRenderChild {
   private generation: Component | null = null;
   private renderedDay = "";
 
-  constructor(containerEl: HTMLElement, readonly plugin: SalamanderHomePlugin) {
+  constructor(containerEl: HTMLElement, readonly plugin: HomewirePlugin) {
     super(containerEl);
   }
 
@@ -65,42 +65,42 @@ export class HomeView extends MarkdownRenderChild {
 
       const root = this.containerEl;
       root.empty();
-      root.addClass("sh-root");
+      root.addClass("hw-root");
       const store = this.plugin.configStore;
       const openDaily = () => void getOrCreateDailyNote(this.plugin.app, today())
         .then((f) => this.plugin.app.workspace.getLeaf(false).openFile(f));
 
-      const banner = root.createDiv({ cls: "sh-banner" });
+      const banner = root.createDiv({ cls: "hw-banner" });
       const bannerWeather = renderBanner(banner, new Date(), [{ label: "daily note", onClick: openDaily }]);
 
       if (store.missing || !store.config) {
         root.createDiv({
-          cls: "sh-muted sh-notice",
+          cls: "hw-muted hw-notice",
           text: store.missing
-            ? "No config note found. Run “Salamander Home: Create homepage”."
+            ? "No config note found. Run “Homewire: Create homepage”."
             : store.error ?? "Loading config…",
         });
         return;
       }
-      renderButtons(banner.createDiv({ cls: "sh-buttons" }), store.config.buttons, (a) => runButtonAction(this.plugin, a));
-      if (store.error) root.createDiv({ cls: "sh-faint sh-notice", text: store.error });
+      renderButtons(banner.createDiv({ cls: "hw-buttons" }), store.config.buttons, (a) => runButtonAction(this.plugin, a));
+      if (store.error) root.createDiv({ cls: "hw-faint hw-notice", text: store.error });
 
-      const cols = root.createDiv({ cls: "sh-cols" });
+      const cols = root.createDiv({ cls: "hw-cols" });
       this.slots = {
         bannerWeather,
-        left: cols.createDiv({ cls: "sh-col sh-col-left" }),
-        center: cols.createDiv({ cls: "sh-col sh-col-center" }),
-        right: cols.createDiv({ cls: "sh-col sh-col-right" }),
+        left: cols.createDiv({ cls: "hw-col hw-col-left" }),
+        center: cols.createDiv({ cls: "hw-col hw-col-center" }),
+        right: cols.createDiv({ cls: "hw-col hw-col-right" }),
       };
       this.mountPanels();
     } catch (err) {
-      console.error("SalamanderHome render error:", err);
+      console.error("Homewire render error:", err);
       const root = this.containerEl;
       root.empty();
-      root.addClass("sh-root");
+      root.addClass("hw-root");
       root.createDiv({
-        cls: "sh-notice sh-neg",
-        text: `Salamander Home error: ${err instanceof Error ? err.message : String(err)} (details in the developer console)`,
+        cls: "hw-notice hw-neg",
+        text: `Homewire error: ${err instanceof Error ? err.message : String(err)} (details in the developer console)`,
       });
     }
   }

@@ -4,7 +4,7 @@ async function get(url: string) {
   const res = await requestUrl({
     url,
     throw: false,
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; salamander-home)" },
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; homewire)" },
   });
   if (res.status < 200 || res.status > 299) throw new Error(`HTTP ${res.status}`);
   return res;

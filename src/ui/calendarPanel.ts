@@ -41,34 +41,34 @@ export function mountCalendar(view: HomeView, el: HTMLElement): { setBillDates(d
   const draw = () => {
     f.label.firstElementChild!.setText(new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" }));
     f.body.empty();
-    const nav = f.body.createDiv({ cls: "sh-cal-nav" });
+    const nav = f.body.createDiv({ cls: "hw-cal-nav" });
     const step = (d: number) => {
       month += d;
       if (month < 0) { month = 11; year--; }
       if (month > 11) { month = 0; year++; }
       draw();
     };
-    nav.createEl("button", { cls: "sh-more", text: "‹" }).addEventListener("click", () => step(-1));
-    nav.createEl("button", { cls: "sh-more", text: "Today" }).addEventListener("click", () => {
+    nav.createEl("button", { cls: "hw-more", text: "‹" }).addEventListener("click", () => step(-1));
+    nav.createEl("button", { cls: "hw-more", text: "Today" }).addEventListener("click", () => {
       year = new Date().getFullYear();
       month = new Date().getMonth();
       draw();
     });
-    nav.createEl("button", { cls: "sh-more", text: "›" }).addEventListener("click", () => step(1));
+    nav.createEl("button", { cls: "hw-more", text: "›" }).addEventListener("click", () => step(1));
 
-    const grid = f.body.createDiv({ cls: "sh-cal" });
+    const grid = f.body.createDiv({ cls: "hw-cal" });
     const ws = weekStart();
     for (let i = 0; i < 7; i++) {
-      grid.createSpan({ cls: "sh-cal-head", text: new Date(2023, 0, 1 + ((i + ws) % 7)).toLocaleDateString(undefined, { weekday: "narrow" }) });
+      grid.createSpan({ cls: "hw-cal-head", text: new Date(2023, 0, 1 + ((i + ws) % 7)).toLocaleDateString(undefined, { weekday: "narrow" }) });
     }
     const notes = daysWithDailyNotes();
     const todayYmd = localYmd(new Date());
     for (const cell of monthGrid(year, month, ws)) {
-      const cls = ["sh-cal-day"];
-      if (!cell.inMonth) cls.push("sh-cal-out");
-      if (cell.date === todayYmd) cls.push("sh-cal-today");
-      if (billDates.has(cell.date)) cls.push("sh-bill");
-      if (notes.has(cell.date)) cls.push("sh-cal-note");
+      const cls = ["hw-cal-day"];
+      if (!cell.inMonth) cls.push("hw-cal-out");
+      if (cell.date === todayYmd) cls.push("hw-cal-today");
+      if (billDates.has(cell.date)) cls.push("hw-bill");
+      if (notes.has(cell.date)) cls.push("hw-cal-note");
       const day = grid.createEl("button", { cls: cls.join(" "), text: String(+cell.date.slice(8)) });
       day.setAttr("aria-label", cell.date);
       day.addEventListener("click", () => open(cell.date));

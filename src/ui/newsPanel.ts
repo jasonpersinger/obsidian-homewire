@@ -23,7 +23,7 @@ async function fetchGroup(group: NewsGroupConfig): Promise<FeedItem[]> {
 
 function titleEl(parent: HTMLElement, item: FeedItem, cls: string): void {
   if (item.link && isHttpUrl(item.link)) {
-    const a = parent.createEl("a", { cls: `${cls} sh-link`, text: item.title, href: item.link });
+    const a = parent.createEl("a", { cls: `${cls} hw-link`, text: item.title, href: item.link });
     a.setAttr("target", "_blank");
     a.setAttr("rel", "noopener noreferrer");
   } else {
@@ -35,25 +35,25 @@ const meta = (item: FeedItem, now: number) =>
   [item.published !== null ? relativeAge(now - item.published) : null, item.source].filter(Boolean).join(" · ");
 
 function drawCards(body: HTMLElement, items: FeedItem[], now: number): void {
-  const row = body.createDiv({ cls: "sh-cards" });
+  const row = body.createDiv({ cls: "hw-cards" });
   for (const item of items) {
-    const card = row.createDiv({ cls: "sh-card" });
-    const img = card.createDiv({ cls: "sh-card-img" });
+    const card = row.createDiv({ cls: "hw-card" });
+    const img = card.createDiv({ cls: "hw-card-img" });
     if (item.image && isHttpUrl(item.image)) {
       img.createEl("img", { attr: { src: item.image, loading: "lazy", referrerpolicy: "no-referrer", alt: "" } });
     }
-    titleEl(card, item, "sh-card-title");
-    card.createDiv({ cls: "sh-card-meta sh-faint", text: meta(item, now) });
+    titleEl(card, item, "hw-card-title");
+    card.createDiv({ cls: "hw-card-meta hw-faint", text: meta(item, now) });
   }
 }
 
 function drawList(body: HTMLElement, items: FeedItem[], now: number): HTMLElement {
-  const list = body.createDiv({ cls: "sh-news" });
+  const list = body.createDiv({ cls: "hw-news" });
   for (const item of items) {
-    const row = list.createDiv({ cls: "sh-news-item" });
-    titleEl(row, item, "sh-news-title");
-    row.createDiv({ cls: "sh-faint", text: meta(item, now) });
-    if (item.summary) row.createDiv({ cls: "sh-news-summary sh-muted", text: item.summary });
+    const row = list.createDiv({ cls: "hw-news-item" });
+    titleEl(row, item, "hw-news-title");
+    row.createDiv({ cls: "hw-faint", text: meta(item, now) });
+    if (item.summary) row.createDiv({ cls: "hw-news-summary hw-muted", text: item.summary });
   }
   return list;
 }
@@ -73,8 +73,8 @@ export function mountNewsGroup(view: HomeView, el: HTMLElement, group: NewsGroup
     if (group.style === "cards") {
       const shown = s.data.slice(0, group.collapseAfter);
       drawCards(f.body, shown, now);
-      if (s.data.length > shown.length) drawList(f.body, s.data.slice(group.collapseAfter), now).addClass("sh-card-overflow");
-      const overflow = f.body.querySelector<HTMLElement>(".sh-card-overflow");
+      if (s.data.length > shown.length) drawList(f.body, s.data.slice(group.collapseAfter), now).addClass("hw-card-overflow");
+      const overflow = f.body.querySelector<HTMLElement>(".hw-card-overflow");
       if (overflow) collapse(overflow, 0);
     } else {
       collapse(drawList(f.body, s.data, now), group.collapseAfter);

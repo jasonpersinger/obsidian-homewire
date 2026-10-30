@@ -1,16 +1,16 @@
-# Salamander Home
+# Homewire
 
 A Glance-style homepage for Obsidian: a date and weather banner, one-click buttons, live news, markets and weather, a **Today** box fed by your daily notes, a simple **bill tracker**, and a month calendar, all in one note.
 
-<!-- ![Salamander Home](docs/screenshot.png) -->
+![Homewire](docs/screenshot.png)
 
 It looks best with the [Salamander](https://github.com/jasonpersinger/obsidian-salamander) theme and follows its palette presets, but it works with any theme.
 
 ## Getting started
 
-1. Install and enable **Salamander Home**.
-2. Run the command **Salamander Home: Create homepage**. It creates three notes (it never overwrites existing ones):
-   - `Home.md`: the page itself (just a `salamander-home` code block)
+1. Install and enable **Homewire**.
+2. Run the command **Homewire: Create homepage**. It creates three notes (it never overwrites existing ones):
+   - `Home.md`: the page itself (just a `homewire` code block)
    - `Home Config.md`: feeds, tickers, weather location and buttons
    - `Bills.md`: your bills
 3. Set your location in `Home Config.md` (`weather.place`, or `lat` and `lon`).
@@ -75,7 +75,7 @@ The **Today** box shows unchecked `- [ ]` items from today's daily note, plus an
 
 ## Network use
 
-Salamander Home fetches data over the network. It contacts only:
+Homewire fetches data over the network. It contacts only:
 
 - **The RSS/Atom feeds you list** in your config, and the image hosts those feeds point to (for card thumbnails).
 - **`query1.finance.yahoo.com`**: market prices for the symbols you list.

@@ -41,7 +41,7 @@ export class AddBillModal extends Modal {
   onOpen(): void {
     this.setTitle("Add bill");
     let name = "", amount = "", due = this.today;
-    const error = this.contentEl.createDiv({ cls: "sh-neg" });
+    const error = this.contentEl.createDiv({ cls: "hw-neg" });
     const submit = () => {
       const a = parseAmount(amount);
       if (!name.trim()) return error.setText("Name is required.");

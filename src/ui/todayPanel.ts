@@ -14,13 +14,13 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
   const sec = view.section();
   const alive = aliveFlag(sec);
   const f = panelFrame(panelEl, "Today");
-  f.label.createEl("a", { cls: "sh-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
+  f.label.createEl("a", { cls: "hw-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
     e.preventDefault();
     openAddTask(plugin);
   });
 
   if (!dailyNotesAvailable()) {
-    f.body.createDiv({ cls: "sh-muted", text: "Enable the core Daily notes plugin to use Today." });
+    f.body.createDiv({ cls: "hw-muted", text: "Enable the core Daily notes plugin to use Today." });
     return;
   }
 
@@ -41,13 +41,13 @@ export function mountToday(view: HomeView, panelEl: HTMLElement): void {
     if (!alive()) return;
     f.body.empty();
     if (items.length === 0) {
-      f.body.createDiv({ cls: "sh-muted", text: "Nothing open." });
+      f.body.createDiv({ cls: "hw-muted", text: "Nothing open." });
       return;
     }
     for (const it of items) {
-      const row = f.body.createEl("label", { cls: it.date ? "sh-task sh-dim" : "sh-task" });
+      const row = f.body.createEl("label", { cls: it.date ? "hw-task hw-dim" : "hw-task" });
       const box = row.createEl("input", { type: "checkbox", cls: "task-list-item-checkbox" });
-      if (it.date) row.createSpan({ cls: "sh-task-date", text: it.date });
+      if (it.date) row.createSpan({ cls: "hw-task-date", text: it.date });
       row.createSpan({ text: it.text });
       box.addEventListener("change", () => {
         box.disabled = true;

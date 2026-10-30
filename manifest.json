@@ -1,6 +1,6 @@
 {
-  "id": "salamander-home",
-  "name": "Salamander Home",
+  "id": "homewire",
+  "name": "Homewire",
   "version": "0.1.0",
   "minAppVersion": "1.8.7",
   "description": "A Glance-style homepage: news, markets, weather, today's tasks, bills and a calendar in one note.",

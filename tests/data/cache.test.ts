@@ -8,14 +8,14 @@ describe("Cache", () => {
     const cache = new Cache(store, undefined, () => 1000);
     expect(cache.set("news:Top", [1, 2])).toEqual({ value: [1, 2], fetchedAt: 1000 });
     expect(cache.get("news:Top")).toEqual({ value: [1, 2], fetchedAt: 1000 });
-    expect([...store.data.keys()]).toEqual(["salamander-home:news:Top"]);
+    expect([...store.data.keys()]).toEqual(["homewire:news:Top"]);
   });
   test("missing or corrupt entries read as null", () => {
     const store = memoryStore();
     const cache = new Cache(store);
     expect(cache.get("nope")).toBeNull();
-    store.data.set("salamander-home:a", "garbage");
-    store.data.set("salamander-home:b", { value: 1 });
+    store.data.set("homewire:a", "garbage");
+    store.data.set("homewire:b", { value: 1 });
     expect(cache.get("a")).toBeNull();
     expect(cache.get("b")).toBeNull();
   });

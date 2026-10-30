@@ -174,7 +174,7 @@ export function notePath(raw: string): string {
   return p.toLowerCase().endsWith(".md") ? p : `${p}.md`;
 }
 
-export const DEFAULT_CONFIG_NOTE = `This note configures your Salamander Home page. Edit the YAML below; the page updates when you save.
+export const DEFAULT_CONFIG_NOTE = `This note configures your Homewire page. Edit the YAML below; the page updates when you save.
 Set \`weather.place\` (or \`lat\` and \`lon\`) to see the weather.
 
 \`\`\`yaml

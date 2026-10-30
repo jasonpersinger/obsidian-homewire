@@ -34,19 +34,19 @@ export function mountMarketGroup(view: HomeView, el: HTMLElement, group: MarketG
     renderStatus(f.status, s);
     if (!s.data) return;
     f.body.empty();
-    const list = f.body.createDiv({ cls: "sh-markets" });
+    const list = f.body.createDiv({ cls: "hw-markets" });
     for (const q of s.data) {
-      const row = list.createDiv({ cls: "sh-row sh-quote" });
-      const id = row.createDiv({ cls: "sh-quote-id" });
-      id.createDiv({ cls: "sh-strong", text: q.symbol });
-      id.createDiv({ cls: "sh-faint sh-ellipsis", text: q.name });
+      const row = list.createDiv({ cls: "hw-row hw-quote" });
+      const id = row.createDiv({ cls: "hw-quote-id" });
+      id.createDiv({ cls: "hw-strong", text: q.symbol });
+      id.createDiv({ cls: "hw-faint hw-ellipsis", text: q.name });
       if ("missing" in q) {
-        row.createDiv({ cls: "sh-muted", text: "—" });
+        row.createDiv({ cls: "hw-muted", text: "—" });
         continue;
       }
-      const tone = q.changePct >= 0 ? "sh-pos" : "sh-neg";
-      sparkline(row.createDiv({ cls: `sh-quote-spark ${tone}` }), q.closes, 80, 24);
-      const num = row.createDiv({ cls: "sh-quote-num" });
+      const tone = q.changePct >= 0 ? "hw-pos" : "hw-neg";
+      sparkline(row.createDiv({ cls: `hw-quote-spark ${tone}` }), q.closes, 80, 24);
+      const num = row.createDiv({ cls: "hw-quote-num" });
       num.createDiv({ cls: tone, text: `${q.changePct >= 0 ? "+" : ""}${q.changePct.toFixed(2)}%` });
       num.createDiv({ text: fmt(q.price) });
     }

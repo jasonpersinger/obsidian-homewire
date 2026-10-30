@@ -8,10 +8,10 @@ import { aliveFlag, panelError, panelFrame } from "./panel";
 
 function dueText(b: Bill, todayYmd: string): { text: string; cls: string } {
   const s = billStatus(b.due, todayYmd);
-  if (s.kind === "late") return { text: `${s.days}d late`, cls: "sh-neg" };
+  if (s.kind === "late") return { text: `${s.days}d late`, cls: "hw-neg" };
   if (s.kind === "soon") {
     const text = s.days === 0 ? "today" : s.days === 1 ? "tomorrow" : `in ${s.days}d`;
-    return { text, cls: "sh-due-soon" };
+    return { text, cls: "hw-due-soon" };
   }
   return { text: new Date(`${b.due}T12:00`).toLocaleDateString(undefined, { month: "short", day: "numeric" }), cls: "" };
 }
@@ -23,7 +23,7 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
   const sec = view.section();
   const alive = aliveFlag(sec);
   const f = panelFrame(el, "Bills");
-  f.label.createEl("a", { cls: "sh-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
+  f.label.createEl("a", { cls: "hw-link", text: "+ add", href: "#" }).addEventListener("click", (e) => {
     e.preventDefault();
     openAddBill(plugin);
   });
@@ -35,25 +35,25 @@ export function mountBills(view: HomeView, el: HTMLElement, onBillsChanged: (unp
     f.body.empty();
     onBillsChanged(new Set(unpaid.map((b) => b.due)));
     if (unpaid.length === 0) {
-      f.body.createDiv({ cls: "sh-muted", text: file ? "Nothing due." : "No bills yet." });
+      f.body.createDiv({ cls: "hw-muted", text: file ? "Nothing due." : "No bills yet." });
       return;
     }
     const todayYmd = localYmd(new Date());
     for (const b of unpaid) {
       const due = dueText(b, todayYmd);
-      const row = f.body.createDiv({ cls: "sh-row sh-bill-row" });
-      const left = row.createDiv({ cls: "sh-bill-left" });
+      const row = f.body.createDiv({ cls: "hw-row hw-bill-row" });
+      const left = row.createDiv({ cls: "hw-bill-left" });
       const box = left.createEl("input", { type: "checkbox", cls: "task-list-item-checkbox", attr: { "aria-label": `Mark ${b.name} paid` } });
       box.addEventListener("change", () => {
         box.disabled = true;
         void toggleTaskInFile(app, path(), b.line, b.raw, true).then(() => redraw());
       });
-      left.createEl("a", { cls: `sh-bill-name ${due.cls === "sh-neg" ? "sh-neg" : ""}`, text: b.name, href: "#" }).addEventListener("click", (e) => {
+      left.createEl("a", { cls: `hw-bill-name ${due.cls === "hw-neg" ? "hw-neg" : ""}`, text: b.name, href: "#" }).addEventListener("click", (e) => {
         e.preventDefault();
         void app.workspace.openLinkText(path(), "", false);
       });
-      const right = row.createDiv({ cls: "sh-bill-right" });
-      if (b.amount !== null) right.createSpan({ cls: "sh-muted", text: `$${b.amount.toFixed(2)} ` });
+      const right = row.createDiv({ cls: "hw-bill-right" });
+      if (b.amount !== null) right.createSpan({ cls: "hw-muted", text: `$${b.amount.toFixed(2)} ` });
       right.createSpan({ cls: due.cls, text: due.text });
     }
   };

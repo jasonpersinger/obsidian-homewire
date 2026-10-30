@@ -15,9 +15,9 @@ export function aliveFlag(sec: Component): () => boolean {
 
 /** Shows a one-line error in place of a panel that failed, without touching the others. */
 export function panelError(el: HTMLElement, title: string, err: unknown): void {
-  console.error(`Salamander Home: ${title} panel failed`, err);
-  el.createDiv({ cls: "sh-section" }).createDiv({
-    cls: "sh-faint sh-offline",
+  console.error(`Homewire: ${title} panel failed`, err);
+  el.createDiv({ cls: "hw-section" }).createDiv({
+    cls: "hw-faint hw-offline",
     text: `${title}: ${err instanceof Error ? err.message : String(err)}`,
   });
 }
@@ -25,11 +25,11 @@ export function panelError(el: HTMLElement, title: string, err: unknown): void {
 export interface PanelFrame { section: HTMLElement; label: HTMLElement; body: HTMLElement; status: HTMLElement }
 
 export function panelFrame(parent: HTMLElement, title: string, boxed = true): PanelFrame {
-  const section = parent.createDiv({ cls: "sh-section" });
-  const label = section.createDiv({ cls: "sh-label" });
+  const section = parent.createDiv({ cls: "hw-section" });
+  const label = section.createDiv({ cls: "hw-label" });
   label.createSpan({ text: title });
-  const body = section.createDiv({ cls: boxed ? "sh-box" : "sh-plain" });
-  const status = section.createDiv({ cls: "sh-faint sh-status" });
+  const body = section.createDiv({ cls: boxed ? "hw-box" : "hw-plain" });
+  const status = section.createDiv({ cls: "hw-faint hw-status" });
   return { section, label, body, status };
 }
 
@@ -37,7 +37,7 @@ export function panelFrame(parent: HTMLElement, title: string, boxed = true): Pa
 export function renderStatus(el: HTMLElement, s: PanelState<unknown>, now = Date.now()): void {
   el.empty();
   if (s.fetchedAt !== null) el.createSpan({ text: `updated ${relativeAge(now - s.fetchedAt)} ago`, attr: { "data-fetched": String(s.fetchedAt) } });
-  if (s.error) el.createSpan({ cls: "sh-offline", text: s.data === null ? `unavailable (${s.error})` : "offline" });
+  if (s.error) el.createSpan({ cls: "hw-offline", text: s.data === null ? `unavailable (${s.error})` : "offline" });
   else if (s.loading && s.data === null) el.createSpan({ text: "loading…" });
 }
 
@@ -46,11 +46,11 @@ export function collapse(list: HTMLElement, n: number): void {
   const items = Array.from(list.children) as HTMLElement[];
   if (items.length <= n) return;
   const extra = items.slice(n);
-  extra.forEach((e) => e.toggleClass("sh-hidden", true));
-  const btn = list.parentElement!.createEl("button", { cls: "sh-more", text: `Show ${extra.length} more` });
+  extra.forEach((e) => e.toggleClass("hw-hidden", true));
+  const btn = list.parentElement!.createEl("button", { cls: "hw-more", text: `Show ${extra.length} more` });
   btn.addEventListener("click", () => {
-    const hidden = extra[0]!.hasClass("sh-hidden");
-    extra.forEach((e) => e.toggleClass("sh-hidden", !hidden));
+    const hidden = extra[0]!.hasClass("hw-hidden");
+    extra.forEach((e) => e.toggleClass("hw-hidden", !hidden));
     btn.setText(hidden ? "Show less" : `Show ${extra.length} more`);
   });
 }

@@ -7,7 +7,7 @@ export interface CacheEntry<T> { value: T; fetchedAt: number }
 export class Cache {
   constructor(
     private readonly store: KeyValueStore,
-    readonly namespace = "salamander-home",
+    readonly namespace = "homewire",
     readonly now: () => number = Date.now,
   ) {}
 
