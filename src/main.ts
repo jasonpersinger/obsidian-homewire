@@ -28,6 +28,13 @@ export default class SalamanderHomePlugin extends Plugin {
     this.addCommand({ id: "create-homepage", name: "Create homepage", callback: () => void createHomepage(this) });
     this.addCommand({ id: "add-bill", name: "Add bill", callback: () => openAddBill(this) });
     this.addCommand({ id: "add-today", name: "Add task to today", callback: () => openAddTask(this) });
+    this.addCommand({
+      id: "refresh",
+      name: "Refresh homepage",
+      callback: () => {
+        for (const view of this.views) view.refreshAll(true);
+      },
+    });
   }
 
   async saveSettings(): Promise<void> {
