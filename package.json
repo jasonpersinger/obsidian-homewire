@@ -1,6 +1,6 @@
 {
   "name": "homewire",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Turn a note into a homepage with live news, markets, weather, today's tasks, bills and a calendar.",
   "main": "main.js",
   "type": "module",
@@ -21,7 +21,6 @@
     "@eslint/js": "9.39.5",
     "@eslint/json": "0.14.0",
     "@types/node": "26.6.6",
-    "builtin-modules": "5.4.0",
     "esbuild": "0.28.2",
     "eslint": "9.39.5",
     "eslint-plugin-obsidianmd": "0.4.2",

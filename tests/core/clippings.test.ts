@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { recentClippings, toClipping } from "../../src/core/clippings";
+import { markdownUnder, recentClippings, toClipping } from "../../src/core/clippings";
 
 // Frontmatter as Obsidian Web Clipper writes it.
 const webClipper = {
@@ -44,4 +44,21 @@ describe("toClipping", () => {
 test("recentClippings sorts newest first and limits", () => {
   const mk = (title: string, created: number) => ({ path: `${title}.md`, title, source: null, site: null, created });
   expect(recentClippings([mk("old", 1), mk("new", 3), mk("mid", 2)], 2).map((c) => c.title)).toEqual(["new", "mid"]);
+});
+
+describe("markdownUnder (walks one folder instead of the whole vault)", () => {
+  const md = (path: string) => ({ path, extension: "md" });
+  test("collects markdown files recursively and skips other files", () => {
+    const tree = {
+      children: [
+        md("Clippings/a.md"),
+        { path: "Clippings/img.png", extension: "png" },
+        { children: [md("Clippings/sub/b.md"), { children: [md("Clippings/sub/deep/c.md")] }] },
+      ],
+    };
+    expect(markdownUnder(tree).map((f) => f.path)).toEqual(["Clippings/a.md", "Clippings/sub/b.md", "Clippings/sub/deep/c.md"]);
+  });
+  test("a missing folder gives nothing", () => {
+    expect(markdownUnder(null)).toEqual([]);
+  });
 });

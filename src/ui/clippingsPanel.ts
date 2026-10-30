@@ -1,5 +1,5 @@
 import { debounce, normalizePath, TFile, type TAbstractFile } from "obsidian";
-import { recentClippings, toClipping } from "../core/clippings";
+import { markdownUnder, recentClippings, toClipping } from "../core/clippings";
 import type { ClippingsConfig } from "../core/config";
 import { relativeAge } from "../core/dates";
 import type { HomeView } from "./HomeView";
@@ -17,7 +17,7 @@ export function mountClippings(view: HomeView, el: HTMLElement, cfg: ClippingsCo
   const draw = () => {
     if (!alive()) return;
     f.body.empty();
-    const all = app.vault.getMarkdownFiles().filter((file) => file.path.startsWith(prefix))
+    const all = markdownUnder<TFile>(app.vault.getFolderByPath(normalizePath(cfg.folder)))
       .map((file) => toClipping(file.path, file.basename, app.metadataCache.getFileCache(file)?.frontmatter, file.stat.mtime));
     const items = recentClippings(all, cfg.limit);
     if (items.length === 0) {

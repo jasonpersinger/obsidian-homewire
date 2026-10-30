@@ -21,3 +21,17 @@ export function toClipping(path: string, basename: string, frontmatter: Record<s
 export function recentClippings(items: Clipping[], limit: number): Clipping[] {
   return [...items].sort((a, b) => b.created - a.created).slice(0, limit);
 }
+
+/** A vault file or folder, as far as walking one folder needs (TFile/TFolder fit this shape). */
+export interface VaultNode { path?: string; extension?: string; children?: VaultNode[] }
+
+/** Markdown files under one folder, recursively, without listing the whole vault. */
+export function markdownUnder<T extends VaultNode = VaultNode>(folder: VaultNode | null): T[] {
+  const out: T[] = [];
+  const walk = (node: VaultNode) => {
+    if (node.children) node.children.forEach(walk);
+    else if (node.extension === "md") out.push(node as T);
+  };
+  if (folder) walk(folder);
+  return out;
+}
