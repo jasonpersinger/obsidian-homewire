@@ -1,6 +1,6 @@
 {
   "name": "homewire",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Turn a note into a homepage with live news, markets, weather, today's tasks, bills and a calendar.",
   "main": "main.js",
   "type": "module",
