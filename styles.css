@@ -17,13 +17,15 @@
   color: var(--text-normal);
 }
 
-/* Full-width note, no inline title */
+/* Full-width note, no inline title or properties header */
 .sh-home .markdown-preview-sizer,
 .sh-home .cm-sizer {
   max-width: none;
 }
-.sh-home .inline-title {
-  display: none;
+.sh-home .inline-title,
+.sh-home .metadata-container,
+.sh-home .metadata-properties {
+  display: none !important;
 }
 
 /* ── Shared ─────────────────────────────────────────────── */
