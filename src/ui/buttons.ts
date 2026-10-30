@@ -1,5 +1,5 @@
-import { Notice, setIcon, type App } from "obsidian";
-import type { ButtonAction, ButtonConfig } from "../core/config";
+import { Notice, setIcon, TFile, TFolder, type App } from "obsidian";
+import { fileTargets, type ButtonAction, type ButtonConfig } from "../core/config";
 import { localYmd } from "../core/dates";
 import { isHttpUrl } from "../core/safeUrl";
 import type HomewirePlugin from "../main";
@@ -19,6 +19,27 @@ export function renderButtons(el: HTMLElement, buttons: ButtonConfig[], run: (a:
 // `app.commands` is not in Obsidian's public typings; this is the one place it is used.
 interface Commands { commands: Record<string, unknown>; executeCommandById(id: string): boolean }
 const commandsOf = (app: App) => (app as unknown as { commands: Commands }).commands;
+
+// The file explorer's revealInFolder is not in the public typings.
+interface FileExplorerView { revealInFolder(target: TFolder | TFile): void }
+
+/** Opens a note, or reveals a folder in the file explorer. Never creates anything. */
+function openVaultPath(app: App, raw: string): void {
+  const target = fileTargets(raw).map((p) => app.vault.getAbstractFileByPath(p)).find((f) => f !== null);
+  if (target instanceof TFile) {
+    void app.workspace.getLeaf(false).openFile(target);
+  } else if (target instanceof TFolder) {
+    const explorer = app.workspace.getLeavesOfType("file-explorer")[0];
+    if (!explorer) {
+      new Notice(`Open the file explorer to see “${target.path}”.`);
+      return;
+    }
+    void app.workspace.revealLeaf(explorer);
+    (explorer.view as unknown as FileExplorerView).revealInFolder(target);
+  } else {
+    new Notice(`Not found in your vault: ${raw}`);
+  }
+}
 
 export function openAddTask(plugin: HomewirePlugin): void {
   if (!dailyNotesAvailable()) {
@@ -46,7 +67,7 @@ export function runButtonAction(plugin: HomewirePlugin, action: ButtonAction): v
     if (!(id in cmds.commands) && (id === "global-search:open" || id.startsWith("omnisearch:"))) id = "global-search:open";
     if (!(id in cmds.commands) || !cmds.executeCommandById(id)) new Notice(`Command not found: ${action.command}`);
   } else if ("file" in action) {
-    void app.workspace.openLinkText(action.file, "", false);
+    openVaultPath(app, action.file);
   } else if ("url" in action) {
     if (isHttpUrl(action.url)) window.open(action.url);
   } else if (action.builtin === "add-bill") {

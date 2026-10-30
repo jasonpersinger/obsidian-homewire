@@ -18,6 +18,10 @@ It looks best with the [Salamander](https://github.com/jasonpersinger/obsidian-s
 
 The three note paths can be changed in the plugin settings.
 
+## Customizing your feeds
+
+**👉 [The setup guide](docs/configuration.md)** covers everything step by step, in plain English: finding a site's RSS feed, the Google News trick for sites without one, market symbol formats (indexes, futures, crypto, currencies, foreign exchanges), weather by place or coordinates, button actions and command IDs, ready-made setups (world news, tech, finance, sports), and troubleshooting. Every example in it was tested.
+
 ## Config reference
 
 `Home Config.md` holds one ```` ```yaml ```` block. The page updates when you save it. If the YAML is invalid, the last good config stays in use and the error appears at the top of the page.

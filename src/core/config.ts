@@ -205,6 +205,13 @@ export function notePath(raw: string): string {
   return p.toLowerCase().endsWith(".md") ? p : `${p}.md`;
 }
 
+/** Vault paths a `{ file: … }` button may mean, most specific first: a bare name can be a folder or a note. */
+export function fileTargets(raw: string): string[] {
+  const p = raw.trim().replace(/\\/g, "/").replace(/\/+/g, "/").replace(/^\/|\/$/g, "");
+  if (/\.[a-z0-9]+$/i.test(p)) return [p];
+  return [p, `${p}.md`];
+}
+
 export const DEFAULT_CONFIG_NOTE = `This note configures your Homewire page. Edit the YAML below; the page updates when you save.
 Set \`weather.place\` (or \`lat\` and \`lon\`) to see the weather.
 

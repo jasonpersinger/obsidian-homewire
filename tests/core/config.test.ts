@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { parse } from "yaml";
-import { DEFAULT_CONFIG_NOTE, extractYamlBlock, groupCacheKey, notePath, validateConfig } from "../../src/core/config";
+import { DEFAULT_CONFIG_NOTE, extractYamlBlock, fileTargets, groupCacheKey, notePath, validateConfig } from "../../src/core/config";
 
 const defaults = () => validateConfig(parse(extractYamlBlock(DEFAULT_CONFIG_NOTE)!));
 
@@ -124,5 +124,17 @@ describe("banner and clippings options", () => {
   });
   test("the default note leaves fear & greed off", () => {
     expect(defaults().config!.banner.fearGreed).toBe(false);
+  });
+});
+
+describe("fileTargets (what a { file: … } button may point at)", () => {
+  test("a bare name may be a folder or a note", () => {
+    expect(fileTargets("Clippings")).toEqual(["Clippings", "Clippings.md"]);
+  });
+  test("an explicit .md path is only that note; slashes are tidied", () => {
+    expect(fileTargets(" Notes//Notepad.md ")).toEqual(["Notes/Notepad.md"]);
+  });
+  test("other extensions are taken as-is", () => {
+    expect(fileTargets("Attachments/plan.pdf")).toEqual(["Attachments/plan.pdf"]);
   });
 });
