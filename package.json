@@ -1,0 +1,36 @@
+{
+  "name": "salamander-home",
+  "version": "0.1.0",
+  "description": "A Glance-style homepage: news, markets, weather, today's tasks, bills and a calendar in one note.",
+  "main": "main.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "test": "vitest run",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "Jason",
+  "license": "MIT",
+  "dependencies": {
+    "obsidian-daily-notes-interface": "0.9.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@eslint/json": "0.14.0",
+    "@types/node": "26.6.6",
+    "builtin-modules": "5.4.0",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-obsidianmd": "0.4.2",
+    "happy-dom": "21.0.4",
+    "obsidian": "1.14.4",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vitest": "5.0.5",
+    "yaml": "2.9.1"
+  }
+}
