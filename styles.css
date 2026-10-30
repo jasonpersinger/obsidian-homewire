@@ -267,3 +267,45 @@
 .hw-root .hw-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hw-root .hw-quote-spark { flex: 0 0 80px; display: flex; }
 .hw-root .hw-quote-num { text-align: right; line-height: 1.25; white-space: nowrap; }
+
+/* ── Banner side (Fear & Greed) ─────────────────────────── */
+.hw-root .hw-banner { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.hw-root .hw-banner-main { flex: 1; min-width: 0; }
+.hw-root .hw-banner-side:empty { display: none; }
+.hw-root .hw-banner-side { flex: 0 0 260px; }
+@container (max-width: 900px) {
+  .hw-root .hw-banner { flex-direction: column; }
+  .hw-root .hw-banner-side { flex-basis: auto; width: 100%; }
+}
+.hw-root .hw-fg .hw-label { margin-top: 0; }
+.hw-root .hw-fg-head { display: flex; align-items: baseline; gap: 10px; }
+.hw-root .hw-fg-score { font-size: 1.9em; font-weight: 700; line-height: 1; text-shadow: var(--salamander-glow, none); }
+.hw-root .hw-fg-rating { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.85em; }
+.hw-root .hw-fg-xfear { color: var(--hw-neg); }
+.hw-root .hw-fg-fear { color: var(--hw-accent); }
+.hw-root .hw-fg-neutral { color: var(--hw-tertiary); }
+.hw-root .hw-fg-greed,
+.hw-root .hw-fg-xgreed { color: var(--hw-pos); }
+.hw-root .hw-fg-bar {
+  position: relative;
+  height: 6px;
+  margin: 8px 0 5px;
+  background: linear-gradient(90deg, var(--hw-neg), var(--hw-accent) 35%, var(--hw-tertiary) 50%, var(--hw-pos));
+  opacity: 0.85;
+}
+.hw-root .hw-fg-marker {
+  position: absolute;
+  left: var(--pos);
+  top: -4px;
+  width: 3px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: var(--text-normal);
+  box-shadow: 0 0 0 1px var(--background-primary);
+}
+
+/* ── Clippings ──────────────────────────────────────────── */
+.hw-root .hw-clip { padding: 4px 0; border-bottom: 1px dashed var(--hw-line); }
+.hw-root .hw-clip:last-child { border-bottom: 0; }
+.hw-root .hw-clip-title { display: block; line-height: 1.35; }
+.hw-root .hw-clip-out { text-decoration: none; }

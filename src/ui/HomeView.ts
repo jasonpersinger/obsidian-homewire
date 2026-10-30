@@ -6,6 +6,8 @@ import { localYmd, relativeAge } from "../core/dates";
 import type HomewirePlugin from "../main";
 import { getOrCreateDailyNote, today } from "../obsidian/dailyNotes";
 import { renderBanner } from "./banner";
+import { mountClippings } from "./clippingsPanel";
+import { mountFearGreed } from "./fearGreedPanel";
 import { renderButtons, runButtonAction } from "./buttons";
 import { mountBills } from "./billsPanel";
 import { mountCalendar } from "./calendarPanel";
@@ -16,7 +18,7 @@ import { panelError } from "./panel";
 import { mountWeather } from "./weatherPanel";
 
 export class HomeView extends MarkdownRenderChild {
-  slots!: { bannerWeather: HTMLElement; left: HTMLElement; center: HTMLElement; right: HTMLElement };
+  slots!: { bannerWeather: HTMLElement; bannerSide: HTMLElement; left: HTMLElement; center: HTMLElement; right: HTMLElement };
   private generation: Component | null = null;
   private renderedDay = "";
 
@@ -70,7 +72,9 @@ export class HomeView extends MarkdownRenderChild {
       const openDaily = () => void getOrCreateDailyNote(this.plugin.app, today())
         .then((f) => this.plugin.app.workspace.getLeaf(false).openFile(f));
 
-      const banner = root.createDiv({ cls: "hw-banner" });
+      const bannerRow = root.createDiv({ cls: "hw-banner" });
+      const banner = bannerRow.createDiv({ cls: "hw-banner-main" });
+      const bannerSide = bannerRow.createDiv({ cls: "hw-banner-side" });
       const bannerWeather = renderBanner(banner, new Date(), [{ label: "daily note", onClick: openDaily }]);
 
       if (store.missing || !store.config) {
@@ -88,6 +92,7 @@ export class HomeView extends MarkdownRenderChild {
       const cols = root.createDiv({ cls: "hw-cols" });
       this.slots = {
         bannerWeather,
+        bannerSide,
         left: cols.createDiv({ cls: "hw-col hw-col-left" }),
         center: cols.createDiv({ cls: "hw-col hw-col-center" }),
         right: cols.createDiv({ cls: "hw-col hw-col-right" }),
@@ -118,6 +123,11 @@ export class HomeView extends MarkdownRenderChild {
     };
     guard(left, "Weather", () => mountWeather(this, left, this.slots.bannerWeather));
     guard(left, "Today", () => mountToday(this, left));
+    if (config.clippings) {
+      const clip = config.clippings;
+      guard(left, "Clippings", () => mountClippings(this, left, clip));
+    }
+    if (config.banner.fearGreed) guard(this.slots.bannerSide, "Fear & Greed", () => mountFearGreed(this, this.slots.bannerSide));
     for (const group of config.news) guard(center, group.title, () => mountNewsGroup(this, center, group));
     let calendar: { setBillDates(d: Set<string>): void } | null = null;
     guard(right, "Calendar", () => (calendar = mountCalendar(this, right)));

@@ -103,3 +103,24 @@ describe("review fixes", () => {
     expect(notePath("/Home Config")).toBe("Home Config.md");
   });
 });
+
+describe("banner and clippings options", () => {
+  const minimal = {};
+  test("defaults: fear & greed off, clippings on from the Clippings folder", () => {
+    const { config } = validateConfig(minimal);
+    expect(config!.banner).toEqual({ fearGreed: false });
+    expect(config!.clippings).toEqual({ folder: "Clippings", limit: 5 });
+  });
+  test("can turn fear & greed on and configure or hide clippings", () => {
+    expect(validateConfig({ banner: { fearGreed: true } }).config!.banner.fearGreed).toBe(true);
+    expect(validateConfig({ clippings: { folder: "Reading", limit: 8 } }).config!.clippings).toEqual({ folder: "Reading", limit: 8 });
+    expect(validateConfig({ clippings: false }).config!.clippings).toBeNull();
+  });
+  test("bad values are errors", () => {
+    expect(validateConfig({ banner: { fearGreed: "yes" } }).errors.join()).toMatch(/banner\.fearGreed/);
+    expect(validateConfig({ clippings: { limit: 0 } }).errors.join()).toMatch(/clippings\.limit/);
+  });
+  test("the default note leaves fear & greed off", () => {
+    expect(defaults().config!.banner.fearGreed).toBe(false);
+  });
+});

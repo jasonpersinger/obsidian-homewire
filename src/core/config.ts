@@ -20,7 +20,11 @@ export interface NewsGroupConfig {
 export interface MarketConfig { symbol: string; name: string }
 export interface MarketGroupConfig { title: string; collapseAfter: number; markets: MarketConfig[] }
 export interface WeatherConfig { place?: string; lat?: number; lon?: number; units: "imperial" | "metric" }
+export interface BannerConfig { fearGreed: boolean }
+export interface ClippingsConfig { folder: string; limit: number }
 export interface HomeConfig {
+  banner: BannerConfig;
+  clippings: ClippingsConfig | null;
   weather: WeatherConfig;
   buttons: ButtonConfig[];
   news: NewsGroupConfig[];
@@ -154,8 +158,31 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
     };
   });
 
+  // banner
+  const banner: BannerConfig = { fearGreed: false };
+  if (raw.banner !== undefined) {
+    if (!isObj(raw.banner)) errors.push("banner must be a mapping");
+    else if (raw.banner.fearGreed !== undefined) {
+      if (typeof raw.banner.fearGreed === "boolean") banner.fearGreed = raw.banner.fearGreed;
+      else errors.push("banner.fearGreed must be true or false");
+    }
+  }
+
+  // clippings (false hides the panel)
+  let clippings: ClippingsConfig | null = { folder: "Clippings", limit: 5 };
+  if (raw.clippings === false) clippings = null;
+  else if (raw.clippings !== undefined) {
+    if (!isObj(raw.clippings)) errors.push("clippings must be a mapping or false");
+    else {
+      clippings = {
+        folder: raw.clippings.folder === undefined ? "Clippings" : str(raw.clippings.folder, "clippings.folder"),
+        limit: num(raw.clippings.limit, "clippings.limit", 5, 1),
+      };
+    }
+  }
+
   if (errors.length) return { config: null, errors };
-  return { config: { weather, buttons, news, markets }, errors };
+  return { config: { banner, clippings, weather, buttons, news, markets }, errors };
 }
 
 /** Cache key that changes whenever the group's sources change, not just its title. */
@@ -178,6 +205,13 @@ export const DEFAULT_CONFIG_NOTE = `This note configures your Homewire page. Edi
 Set \`weather.place\` (or \`lat\` and \`lon\`) to see the weather.
 
 \`\`\`yaml
+banner:
+  fearGreed: false         # CNN Fear & Greed index (unofficial source; may stop working)
+
+clippings:                 # newest notes saved by Obsidian Web Clipper; "false" hides the panel
+  folder: Clippings
+  limit: 5
+
 weather:
   units: imperial          # or metric
   # place: Paris, France   # a place name, looked up once
