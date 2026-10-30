@@ -1,0 +1,34 @@
+{
+ "station": {
+  "name": "Kobold.FM",
+  "listen_url": "https://kobold.messy.quest/listen/kobold.fm/radio.mp3"
+ },
+ "listeners": {
+  "total": 6,
+  "unique": 5,
+  "current": 6
+ },
+ "live": {
+  "is_live": false,
+  "streamer_name": "",
+  "broadcast_start": null,
+  "art": null
+ },
+ "is_online": true,
+ "now_playing": {
+  "played_at": 1793397704,
+  "duration": 2132,
+  "elapsed": 2052,
+  "song": {
+   "title": "The Forgotten Abode of Seclusion and Solace",
+   "artist": "Shogun's Castle",
+   "art": "https://kobold.messy.quest/api/station/kobold.fm/art/e9af58d95a3373185b8e7cc4-1791384895.jpg"
+  }
+ },
+ "playing_next": {
+  "song": {
+   "title": "The Divine Call",
+   "artist": "Medievalist"
+  }
+ }
+}

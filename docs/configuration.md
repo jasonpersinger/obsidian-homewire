@@ -9,6 +9,7 @@ This guide walks through everything you can change on your Homewire page: news f
 - [Buttons](#buttons)
 - [Banner](#banner)
 - [Recent clippings](#recent-clippings)
+- [Radio](#radio)
 - [Ready-made setups](#ready-made-setups)
 - [Troubleshooting](#troubleshooting)
 
@@ -313,6 +314,35 @@ clippings:
 ```
 
 If you've set Web Clipper to save somewhere else, put that folder here. To hide the panel completely, write `clippings: false`.
+
+---
+
+## Radio
+
+Homewire can play an internet radio station in the left column, with a **Listen / Stop** button. The music keeps playing while you open other notes, and stops when you press Stop or close Obsidian.
+
+**For a station that runs on [AzuraCast](https://www.azuracast.com)**, give the server's address and the station's short name. You get the album art, artist and title, a progress bar, what's up next, the listener count, and a **LIVE** badge when a DJ is on air:
+
+```yaml
+radio:
+  name: Kobold.FM                       # optional; otherwise the station's own name
+  server: https://kobold.messy.quest
+  station: kobold.fm
+```
+
+The short name is the last part of the station's public page address. For `https://kobold.messy.quest/public/kobold.fm`, it's `kobold.fm`.
+
+**For any other station**, give the address of its audio stream (usually ending in `.mp3`, `.aac` or `/stream`). You get a play button without track details:
+
+```yaml
+radio:
+  name: My Station
+  stream: https://example.com/live.mp3
+```
+
+To find a stream address, look for a "Listen", "Direct link" or ".pls"/".m3u" download on the station's site. Open a `.pls` or `.m3u` file in a text editor and the stream address is inside.
+
+On iPhone and iPad, iOS usually pauses the audio when you switch apps or lock the screen.
 
 ---
 

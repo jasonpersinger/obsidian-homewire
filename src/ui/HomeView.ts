@@ -18,6 +18,7 @@ import { mountNewsGroup } from "./newsPanel";
 import { mountToday } from "./todayPanel";
 import { panelError } from "./panel";
 import { mountWeather } from "./weatherPanel";
+import { mountRadio } from "./radioPanel";
 import { mountWire } from "./wirePanel";
 
 /** What panels publish for the banner wire and day summary; reset on every render. */
@@ -153,6 +154,10 @@ export class HomeView extends MarkdownRenderChild {
     if (config.clippings) {
       const clip = config.clippings;
       guard(left, "Clippings", () => mountClippings(this, left, clip));
+    }
+    if (config.radio) {
+      const radio = config.radio;
+      guard(left, "Radio", () => mountRadio(this, left, radio));
     }
     const wireEl = this.slots.bannerWire;
     if (config.banner.wire || config.banner.summary) guard(wireEl, "Wire", () => mountWire(this, wireEl, config.banner));

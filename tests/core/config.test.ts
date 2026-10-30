@@ -138,3 +138,19 @@ describe("fileTargets (what a { file: … } button may point at)", () => {
     expect(fileTargets("Attachments/plan.pdf")).toEqual(["Attachments/plan.pdf"]);
   });
 });
+
+describe("radio options", () => {
+  test("off by default", () => expect(validateConfig({}).config!.radio).toBeNull());
+  test("AzuraCast server + station", () => {
+    expect(validateConfig({ radio: { name: "Kobold.FM", server: "https://kobold.messy.quest", station: "kobold.fm" } }).config!.radio)
+      .toEqual({ name: "Kobold.FM", server: "https://kobold.messy.quest", station: "kobold.fm" });
+  });
+  test("plain stream url", () => {
+    expect(validateConfig({ radio: { stream: "https://example.com/live.mp3" } }).config!.radio).toEqual({ stream: "https://example.com/live.mp3" });
+  });
+  test("needs server+station or a stream, and only http(s)", () => {
+    expect(validateConfig({ radio: { name: "x" } }).errors.join()).toMatch(/radio/);
+    expect(validateConfig({ radio: { server: "https://a" } }).errors.join()).toMatch(/radio\.station/);
+    expect(validateConfig({ radio: { stream: "javascript:alert(1)" } }).errors.join()).toMatch(/radio\.stream/);
+  });
+});

@@ -1,6 +1,7 @@
 import { Plugin } from "obsidian";
 import { notePath } from "./core/config";
 import { Cache } from "./data/cache";
+import { RadioPlayer } from "./obsidian/radioPlayer";
 import { ConfigStore } from "./obsidian/configStore";
 import { createHomepage } from "./obsidian/createHomepage";
 import { DEFAULT_SETTINGS, HomewireSettingTab, type HomewireSettings } from "./settings";
@@ -12,6 +13,7 @@ export default class HomewirePlugin extends Plugin {
   configStore!: ConfigStore;
   cache!: Cache;
   readonly views = new Set<HomeView>();
+  readonly radio = new RadioPlayer();
 
   async onload(): Promise<void> {
     const saved = { ...DEFAULT_SETTINGS, ...((await this.loadData()) as Partial<HomewireSettings> | null) };
@@ -37,6 +39,10 @@ export default class HomewirePlugin extends Plugin {
         for (const view of this.views) view.refreshAll(true);
       },
     });
+  }
+
+  onunload(): void {
+    this.radio.stop();
   }
 
   async saveSettings(): Promise<void> {

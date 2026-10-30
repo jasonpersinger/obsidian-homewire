@@ -349,3 +349,88 @@
 .hw-root .hw-wire-mark { color: var(--hw-accent); font-weight: 700; }
 .hw-root .hw-wire-title { text-decoration: none; }
 .hw-root .hw-wire-summary { margin-top: 6px; }
+
+/* ── Radio ──────────────────────────────────────────────── */
+.hw-root .hw-radio-meta { display: inline-flex; gap: 10px; text-transform: none; letter-spacing: 0.02em; }
+.hw-root .hw-radio-live { color: var(--hw-neg); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.hw-root .hw-radio {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 8px 12px;
+  align-items: start;
+}
+.hw-root .hw-radio-art {
+  width: 76px;
+  height: 76px;
+  border: 1px solid var(--hw-line);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: repeating-linear-gradient(45deg, var(--background-modifier-hover) 0 6px, transparent 6px 12px);
+}
+.hw-root .hw-radio-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hw-root .hw-radio-info { min-width: 0; }
+.hw-root .hw-radio-artist { font-size: 0.85em; }
+.hw-root .hw-radio-title {
+  color: var(--text-normal);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1px 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hw-root .hw-radio-bar { height: 3px; background: var(--background-modifier-hover); overflow: hidden; }
+.hw-root .hw-radio-fill {
+  height: 100%;
+  width: var(--progress, 0%);
+  background: var(--hw-accent);
+  box-shadow: var(--salamander-glow, none);
+  transition: width 1s linear;
+}
+.hw-root .hw-radio-times { margin-top: 3px; font-size: 0.8em; font-variant-numeric: tabular-nums; }
+.hw-root .hw-radio-next { grid-column: 1 / -1; font-size: 0.85em; }
+.hw-root .hw-radio-next:empty { display: none; }
+.hw-root .hw-radio-plain { grid-template-columns: 1fr; }
+.hw-root .hw-radio-plain :is(.hw-radio-art, .hw-radio-bar, .hw-radio-times, .hw-radio-artist) { display: none; }
+
+.hw-root .hw-radio-play {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: auto;
+  padding: 7px 12px;
+  border: 1px solid var(--hw-accent);
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--hw-accent) 10%, transparent);
+  box-shadow: none;
+  color: var(--hw-accent);
+  font-family: var(--font-interface);
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.hw-root .hw-radio-play:hover { background: color-mix(in srgb, var(--hw-accent) 18%, transparent); }
+.hw-root .hw-radio-play:disabled { opacity: 0.5; cursor: default; }
+.hw-root .hw-radio-play.is-playing { background: var(--hw-accent); color: var(--text-on-accent); box-shadow: var(--salamander-glow, none); }
+.hw-root .hw-radio-icon { display: inline-flex; }
+.hw-root .hw-radio-icon svg { width: 14px; height: 14px; }
+.hw-root .hw-radio-btn-text { flex: 1; text-align: left; }
+
+/* Equalizer bars: only visible (and moving) while playing. */
+.hw-root .hw-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; visibility: hidden; }
+.hw-root .hw-eq span { width: 3px; height: 30%; background: currentColor; }
+.hw-root .hw-radio-play.is-playing .hw-eq { visibility: visible; }
+.hw-root .hw-radio-play.is-playing .hw-eq span { animation: hw-eq 0.9s ease-in-out infinite alternate; }
+.hw-root .hw-radio-play.is-playing .hw-eq span:nth-child(2) { animation-delay: -0.3s; animation-duration: 0.7s; }
+.hw-root .hw-radio-play.is-playing .hw-eq span:nth-child(3) { animation-delay: -0.6s; animation-duration: 1.1s; }
+.hw-root .hw-radio-play.is-playing .hw-eq span:nth-child(4) { animation-delay: -0.2s; animation-duration: 0.8s; }
+.hw-root .hw-radio-play.is-loading .hw-radio-btn-text { animation: hw-pulse 1s ease-in-out infinite alternate; }
+@keyframes hw-eq { from { height: 20%; } to { height: 100%; } }
+@keyframes hw-pulse { from { opacity: 0.5; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .hw-root .hw-radio-play.is-playing .hw-eq span,
+  .hw-root .hw-radio-play.is-loading .hw-radio-btn-text { animation: none; height: 70%; }
+}

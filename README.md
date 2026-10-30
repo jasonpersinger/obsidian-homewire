@@ -39,6 +39,12 @@ clippings:                   # newest notes from Obsidian Web Clipper (default s
   limit: 5
 # clippings: false           # hides the panel
 
+radio:                       # internet radio player (off unless set)
+  name: Kobold.FM
+  server: https://kobold.messy.quest   # an AzuraCast server…
+  station: kobold.fm                    # …and its station short name: shows art, track, up next, listeners
+  # stream: https://example.com/live.mp3   # or any plain stream address (play button only)
+
 weather:
   units: imperial            # imperial | metric (default imperial)
   place: Paris, France       # looked up once via Open-Meteo geocoding
@@ -101,6 +107,7 @@ Homewire fetches data over the network. It contacts only:
 - **`query1.finance.yahoo.com`**: market prices for the symbols you list.
 - **`api.open-meteo.com`** and **`air-quality-api.open-meteo.com`**: forecast and air quality for your location.
 - **`geocoding-api.open-meteo.com`**: once, to turn `weather.place` into coordinates.
+- **The radio server or stream you configure**, only if you set up `radio`: its now-playing API every 15 seconds while the page is open, and the audio stream only while you're listening.
 - **`production.dataviz.cnn.io`**: only if you turn on `banner.fearGreed`. This is CNN's unofficial Fear & Greed endpoint. It only answers browser-like requests, so Homewire sends a browser User-Agent and a CNN referer for this one request. It may change or stop working without notice; the gauge then shows "unavailable".
 
 No account, API key or telemetry is involved, and nothing about you or your vault is sent. Results are cached on each device (not in synced files) and refreshed only while the homepage is open.

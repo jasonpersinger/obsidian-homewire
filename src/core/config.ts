@@ -1,5 +1,6 @@
 // Shape and validation of the YAML block in the user's config note.
 // Pure: no `obsidian` import, so it is unit-tested directly.
+import { isHttpUrl } from "./safeUrl";
 
 export type ButtonAction =
   | { command: string }
@@ -22,9 +23,12 @@ export interface MarketGroupConfig { title: string; collapseAfter: number; marke
 export interface WeatherConfig { place?: string; lat?: number; lon?: number; units: "imperial" | "metric" }
 export interface BannerConfig { fearGreed: boolean; clock: boolean; marketSession: boolean; wire: boolean; summary: boolean }
 export interface ClippingsConfig { folder: string; limit: number }
+/** An AzuraCast station (server + station) or any plain stream URL. */
+export interface RadioConfig { name?: string; server?: string; station?: string; stream?: string }
 export interface HomeConfig {
   banner: BannerConfig;
   clippings: ClippingsConfig | null;
+  radio: RadioConfig | null;
   weather: WeatherConfig;
   buttons: ButtonConfig[];
   news: NewsGroupConfig[];
@@ -185,8 +189,30 @@ export function validateConfig(raw: unknown): { config: HomeConfig | null; error
     }
   }
 
+  // radio (off unless configured)
+  let radio: RadioConfig | null = null;
+  if (raw.radio !== undefined && raw.radio !== false) {
+    if (!isObj(raw.radio)) errors.push("radio must be a mapping");
+    else {
+      const r = raw.radio;
+      radio = {};
+      if (r.name !== undefined) radio.name = str(r.name, "radio.name");
+      const httpUrl = (v: unknown, path: string) => {
+        if (typeof v === "string" && isHttpUrl(v.trim())) return v.trim();
+        errors.push(`${path} must be an http(s) address`);
+        return "";
+      };
+      if (r.stream !== undefined) radio.stream = httpUrl(r.stream, "radio.stream");
+      if (r.server !== undefined || r.station !== undefined) {
+        radio.server = httpUrl(r.server, "radio.server");
+        radio.station = str(r.station, "radio.station");
+      }
+      if (!radio.stream && !radio.server) errors.push("radio needs either server + station (AzuraCast) or a stream address");
+    }
+  }
+
   if (errors.length) return { config: null, errors };
-  return { config: { banner, clippings, weather, buttons, news, markets }, errors };
+  return { config: { banner, clippings, radio, weather, buttons, news, markets }, errors };
 }
 
 /** Cache key that changes whenever the group's sources change, not just its title. */
@@ -222,6 +248,12 @@ banner:
   wire: true               # rotating headline from all your news groups
   summary: true            # one line: open tasks, next bill, sunset
   fearGreed: false         # CNN Fear & Greed index (unofficial source; may stop working)
+
+# radio:                   # internet radio player (off unless set)
+#   name: My Station
+#   server: https://radio.example.com   # an AzuraCast server…
+#   station: my_station                 # …and the station's short name
+#   # stream: https://example.com/live.mp3   # or any plain stream address
 
 clippings:                 # newest notes saved by Obsidian Web Clipper; "false" hides the panel
   folder: Clippings
