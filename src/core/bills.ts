@@ -1,16 +1,27 @@
 // Bill lines: `- [ ] Electric · $142.18 · due 2026-11-03` (amount optional).
 import { daysBetween } from "./dates";
+import { codeLines } from "./tasks";
 
 export interface Bill { line: number; raw: string; name: string; amount: number | null; due: string; paid: boolean }
 export type BillStatus = { kind: "late" | "soon" | "upcoming"; days: number };
 
-const BILL = /^\s*[-*] \[( |x|X)\]\s+((.+?)\s*·\s*(?:\$([\d,]+(?:\.\d{1,2})?)\s*·\s*)?due\s+(\d{4}-\d{2}-\d{2}))\s*$/;
+const BILL = /^\s*[-*] \[( |x|X)\]\s+((.+?)\s*·\s*(?:\$?\s*([\d,]+(?:\.\d{1,2})?)\s*·\s*)?due\s+(\d{4}-\d{2}-\d{2}))\s*$/;
+
+/** Rejects dates like 2026-13-45 or 2026-02-30 that the pattern alone would accept. */
+function isRealDate(ymd: string): boolean {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const t = new Date(Date.UTC(y!, m! - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m! - 1 && t.getUTCDate() === d;
+}
 
 export function parseBills(markdown: string): Bill[] {
   const out: Bill[] = [];
-  markdown.split(/\r?\n/).forEach((l, line) => {
+  const lines = markdown.split(/\r?\n/);
+  const code = codeLines(lines);
+  lines.forEach((l, line) => {
+    if (code[line]) return;
     const m = BILL.exec(l);
-    if (!m) return;
+    if (!m || !isRealDate(m[5]!)) return;
     out.push({
       line,
       raw: m[2]!.trim(),

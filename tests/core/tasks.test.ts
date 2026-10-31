@@ -46,3 +46,14 @@ describe("setTaskChecked", () => {
     expect(setTaskChecked("- [x] done", 0, "done", false)).toBe("- [ ] done");
   });
 });
+
+describe("code blocks and frontmatter (0.5.1)", () => {
+  const md = "---\ntodo: \"- [ ] not a task\"\n---\n- [ ] real\n```md\n- [ ] in code\n```\n~~~\n- [ ] in tilde code\n~~~\n- [ ] also real";
+  test("only real tasks are listed", () => {
+    expect(extractOpenTasks(md)).toEqual([{ line: 3, text: "real" }, { line: 10, text: "also real" }]);
+  });
+  test("a moved task is never matched inside a code block", () => {
+    const moved = "x\n```\n- [ ] dup\n```\n- [ ] dup";
+    expect(setTaskChecked(moved, 0, "dup", true)!.split("\n")[4]).toBe("- [x] dup");
+  });
+});

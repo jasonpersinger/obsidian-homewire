@@ -72,3 +72,20 @@ describe("billStatus", () => {
   test("four days out is upcoming", () => expect(billStatus("2026-11-03", "2026-10-30")).toEqual({ kind: "upcoming", days: 4 }));
   test("year boundary", () => expect(billStatus("2027-01-02", "2026-12-31")).toEqual({ kind: "soon", days: 2 }));
 });
+
+describe("bill lines typed by hand (0.5.1)", () => {
+  test("amount without a $ sign, or with a space after it", () => {
+    expect(parseBills("- [ ] Gas · 40 · due 2026-11-09")[0]).toMatchObject({ name: "Gas", amount: 40 });
+    expect(parseBills("- [ ] Water · $ 1,204.50 · due 2026-11-09")[0]).toMatchObject({ name: "Water", amount: 1204.5 });
+  });
+  test("a number that is part of the name stays in the name", () => {
+    expect(parseBills("- [ ] Unit 4 rent · due 2026-11-01")[0]).toMatchObject({ name: "Unit 4 rent", amount: null });
+  });
+  test("impossible dates are skipped, not shown as Invalid Date", () => {
+    expect(parseBills("- [ ] Bad · due 2026-13-45\n- [ ] Feb · due 2026-02-30\n- [ ] Leap · due 2028-02-29")
+      .map((b) => b.name)).toEqual(["Leap"]);
+  });
+  test("bills inside a code block are ignored", () => {
+    expect(parseBills("```\n- [ ] Example · due 2026-11-01\n```\n- [ ] Real · due 2026-11-02").map((b) => b.name)).toEqual(["Real"]);
+  });
+});
